@@ -1,0 +1,42 @@
+# General TypeScript & JavaScript Coding Standards
+
+You are an expert full-stack developer.
+Follow these rules strictly when generating code.
+
+## 1. Naming Conventions
+- **General:** Use `camelCase` for functions and variables.
+- **Specific Naming:** Avoid vague names like `Data`, `Info`, or `Object`. Use descriptive names that reflect the entity's purpose.
+- **Parts of Speech:**
+  - Variables/Parameters: Use **nouns** (e.g., `userProfile`, `retryCount`).
+  - Functions/Methods: Use **verbs**. Be descriptive even if the name becomes long (e.g., `calculateTotalAdjustedPrice`, `fetchUserAuthenticationStatus`).
+- **Constants:** Use `UPPER_SNAKE_CASE` for all constant values (e.g., `MAX_RETRY_LIMIT = 5`).
+
+## 2. Logic & Flow Control
+- **Conditionals:**
+  - Always use curly braces `{}` for `if` statements.
+  - Use explicit boolean values in conditions.
+  - **Null/Undefined Checks:** Use `== null` to check for both `null` and `undefined`. For all other comparisons, use strict equality `===`.
+  - **Intuitive Conditions:** Avoid negative conditions (e.g., `!isNotValid`). Define a variable that describes the condition's purpose before using it in the `if` statement.
+- **Early Return:** Prefer `if` with early returns over `else` or `else-if` blocks to reduce nesting.
+- **Operators:** Use the Nullish Coalescing operator `??` by default. Use Logical OR `||` only for mathematical or logical necessities.
+
+## 3. Programming Paradigm (Functional Programming)
+- **Immutability:** Follow functional programming principles. Do not reassign variables.
+- **Variable Declaration:** Avoid `let`; strictly use `const`.
+- **Logic Separation:** Extract non-business logic (e.g., `retry`, `chunk`, `format`) into separate utility functions.
+- **Magic Values:** Do not use magic numbers or strings. Replace them with meaningful constants.
+
+## 4. TypeScript Best Practices
+- **No Type Casting:** Do not use `as` casting.
+- **No Any:** Strictly forbid the use of `any`.
+- **Type Inference:** Do not explicitly write types when TypeScript can clearly infer them.
+- **Safety:** Ensure all code is type-safe without bypassing the compiler.
+
+## 5. React & React Native Best Practices
+- **Component Declaration:** Export components using the `export const ComponentName = ...` syntax.
+- **Props Handling:** Do not pass `setState` directly to props. Wrap it in a handler function (e.g., `handleChange`, `onValueChange`).
+- **Hooks:** Avoid `useEffect` whenever possible. Prefer derived state or event handlers.
+- **Separation of Concerns:**
+  - Separate the **Business Logic Area** (hooks, calculations) from the **Rendering Area** (JSX).
+  - Minimize ternary operators and inline logic within the Rendering Area.
+  - Pre-calculate all necessary values in the Business Logic Area so the Rendering Area only consumes them.
