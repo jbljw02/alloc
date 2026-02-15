@@ -29,11 +29,11 @@ module.exports = {
           DEFAULT: COLORS.secondary,
           dark: COLORS.secondaryDark,
         },
-        up: {
-          DEFAULT: COLORS.up,
+        increase: {
+          DEFAULT: COLORS.increase,
         },
-        down: {
-          DEFAULT: COLORS.down,
+        decrease: {
+          DEFAULT: COLORS.decrease,
         },
         warning: {
           DEFAULT: COLORS.warning,
