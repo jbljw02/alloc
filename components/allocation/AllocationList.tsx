@@ -41,7 +41,7 @@ export const AllocationList = ({
           <View key={item.id} className="flex-row justify-between items-center py-3.5 border-b border-gray-100">
             <View className="flex-row items-center">
               <TouchableOpacity onPress={() => onRemove(item.id)} className="mr-3">
-                <Ionicons name="remove-circle" size={22} color={COLORS.danger} />
+                <Ionicons name="remove-circle" size={22} color={COLORS.failure} />
               </TouchableOpacity>
               <View className={`w-8 h-8 rounded-[10px] items-center justify-center mr-2.5 ${config.bgClass}`}>
                 <Ionicons name={config.icon} size={14} color={config.color} />

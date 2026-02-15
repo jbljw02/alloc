@@ -33,15 +33,15 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
               <View>
                 <View className="flex-row items-center mb-1">
                   <Text className="text-[15px] font-semibold text-gray-800 mr-2">{item.name}</Text>
-                  <View className={`px-1.5 py-0.5 rounded-md ${isInvest ? 'bg-primary-light' : 'bg-success-light'}`}>
-                    <Text className={`text-[10px] font-bold ${isInvest ? 'text-primary' : 'text-success'}`}>
+                  <View className={`px-1.5 py-0.5 rounded-md ${isInvest ? 'bg-primary-light' : 'bg-emerald-light'}`}>
+                    <Text className={`text-[10px] font-bold ${isInvest ? 'text-primary' : 'text-emerald'}`}>
                       {item.category}
                     </Text>
                   </View>
                 </View>
                 <Text
                   className="text-xs font-medium mt-0.5"
-                  style={{ color: isPositiveProfit ? COLORS.danger : '#3B82F6' }}
+                  style={{ color: isPositiveProfit ? COLORS.increase : COLORS.decrease }}
                 >
                   수익률 {item.profit}
                 </Text>

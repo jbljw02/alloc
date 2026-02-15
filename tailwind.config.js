@@ -14,18 +14,26 @@ module.exports = {
           DEFAULT: COLORS.primary,
           light: COLORS.primaryLight,
         },
-        invest: {
-          DEFAULT: COLORS.invest,
-        },
-        danger: {
-          DEFAULT: COLORS.danger,
+        emerald: {
+          DEFAULT: COLORS.emerald,
+          light: COLORS.emeraldLight,
         },
         success: {
           DEFAULT: COLORS.success,
-          light: COLORS.successLight,
+          light: COLORS.emeraldLight,
         },
-        cash: {
-          DEFAULT: COLORS.cash,
+        failure: {
+          DEFAULT: COLORS.failure,
+        },
+        secondary: {
+          DEFAULT: COLORS.secondary,
+          dark: COLORS.secondaryDark,
+        },
+        up: {
+          DEFAULT: COLORS.up,
+        },
+        down: {
+          DEFAULT: COLORS.down,
         },
         warning: {
           DEFAULT: COLORS.warning,
