@@ -1,31 +1,28 @@
-import { StyleSheet } from 'react-native';
+import { PortfolioList } from '@/components/dashboard/PortfolioList';
+import { SummaryCards } from '@/components/dashboard/SummaryCards';
+import { TotalAssetsChart } from '@/components/dashboard/TotalAssetsChart';
+import { DASHBOARD_DATA } from '@/constants/mock-dashboard';
+import React from 'react';
+import { SafeAreaView, ScrollView, StatusBar, View } from 'react-native';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+export default function HomeScreen() {
+  const { totalAssets, lastMonthDiff, summary, assets } = DASHBOARD_DATA;
 
-export default function TabOneScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
+    <SafeAreaView className="flex-1 bg-gray-50">
+      <StatusBar barStyle="dark-content" />
+
+      <ScrollView contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
+        <TotalAssetsChart
+          totalAssets={totalAssets}
+          lastMonthDiff={lastMonthDiff}
+          investTotal={summary.investTotal}
+          cashTotal={summary.cashTotal}
+        />
+        <SummaryCards investTotal={summary.investTotal} cashTotal={summary.cashTotal} />
+        <PortfolioList assets={assets} />
+        <View className="h-[60px]" />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});

@@ -1,14 +1,28 @@
 /** 프로젝트 색상 정의 (Single Source of Truth) */
 const COLORS = {
-  primary: '#4F46E5', // 인디고 (메인 브랜드, 강조)
-  primaryLight: '#EEF2FF', // 연한 인디고 (배경용)
-  danger: '#EF4444', // 빨강 (삭제, 오류, 초과)
-  success: '#10B981', // 에메랄드 (성공, 현금)
-  successLight: '#ECFDF5', // 연한 에메랄드 (배경용)
-  warning: '#F59E0B', // 앰버 (경고, 소비)
-  warningLight: '#FFFBEB', // 연한 앰버 (배경용)
-  secondary: '#4B5563', // 회색 (보조 아이콘/텍스트)
-  secondaryDark: '#374151', // 진한 회색 (강조 보조)
+  // 주요 (인디고, 연한 인디고)
+  primary: '#4F46E5',
+  primaryLight: '#EEF2FF',
+
+  // 주요 (에메랄드, 연한 에메랄드)
+  emerald: '#10B981',
+  emeraldLight: '#ECFDF5',
+
+  // 성공 / 실패
+  success: '#10B981',
+  failure: '#EF4444',
+
+  // 보조 텍스트 (회색)
+  secondary: '#4B5563',
+  secondaryDark: '#374151',
+
+  // 상승(빨강) / 하락(파랑)
+  increase: '#EF4444',
+  decrease: '#3B82F6',
+
+  // 소비(앰버) - 카테고리용
+  warning: '#F59E0B',
+  warningLight: '#FFFBEB',
 };
 
 export { COLORS };

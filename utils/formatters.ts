@@ -1,10 +1,17 @@
 import { isNil } from '@/utils/validators';
 
-export const formatNumber = (num: string) => {
-  if (isNil(num)) {
+export const formatNumber = (value: string | number): string => {
+  if (isNil(value)) {
     return '';
   }
 
-  const cleanNum = num.replace(/[^0-9]/g, '');
+  if (typeof value === 'number') {
+    if (Number.isNaN(value)) {
+      return '';
+    }
+    return value.toLocaleString();
+  }
+
+  const cleanNum = value.replace(/[^0-9]/g, '');
   return cleanNum ? parseInt(cleanNum).toLocaleString() : '';
 };
