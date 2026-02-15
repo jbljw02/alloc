@@ -14,12 +14,18 @@ module.exports = {
           DEFAULT: COLORS.primary,
           light: COLORS.primaryLight,
         },
+        invest: {
+          DEFAULT: COLORS.invest,
+        },
         danger: {
           DEFAULT: COLORS.danger,
         },
         success: {
           DEFAULT: COLORS.success,
           light: COLORS.successLight,
+        },
+        cash: {
+          DEFAULT: COLORS.cash,
         },
         warning: {
           DEFAULT: COLORS.warning,

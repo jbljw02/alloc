@@ -1,8 +1,10 @@
 export declare const COLORS: {
   readonly primary: '#4F46E5';
+  readonly invest: '#4F46E5';
   readonly primaryLight: '#EEF2FF';
   readonly danger: '#EF4444';
   readonly success: '#10B981';
+  readonly cash: '#10B981';
   readonly successLight: '#ECFDF5';
   readonly warning: '#F59E0B';
   readonly warningLight: '#FFFBEB';
