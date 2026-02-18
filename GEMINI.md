@@ -37,6 +37,14 @@ This file defines the specific instructions and standards for Gemini CLI in the 
 - **Separation of Concerns**: Separate Business Logic (hooks, calculations) from Rendering (JSX).
 - Pre-calculate values in Business Logic Area.
 
+## Operational Principles (Working Rules)
+
+- **Surgical Changes**: Only modify files strictly necessary for the assigned task. Avoid unrelated refactoring.
+- **Explicit Git Operations**: Do not perform `git commit`, `push`, or create Pull Requests unless explicitly instructed by the user.
+- **Consult Before Expanding**: If a task requires changes beyond the initial context or if additional improvements are identified, ask for user confirmation before proceeding.
+- **No Unsolicited Work**: Do not initiate tasks or modifications that were not specifically requested.
+- **Plan-First Approach**: Before making any file edits, provide a concise summary of the planned changes and wait for user approval.
+
 ## Gemini Automation Workflow
 
 ### Local Automation
