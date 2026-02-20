@@ -4,7 +4,7 @@ export interface Asset {
   id: string;
   userId: string | null;
   name: string;
-  category: CategoryType | null;
+  category: CategoryType;
   currentBalance: number | null;
   iconName: string | null;
   color: string | null;
