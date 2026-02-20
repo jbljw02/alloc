@@ -3,9 +3,18 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": ["./*"],
-      "@/constants/*": ["./constants/*"],
-      "@/utils/*": ["./utils/*"]
+      "@/*": [
+        "./*"
+      ],
+      "@/constants/*": [
+        "./constants/*"
+      ],
+      "@/utils/*": [
+        "./utils/*"
+      ],
+      "@types/*": [
+        "./types/*"
+      ]
     }
   },
   "include": [
