@@ -5,6 +5,8 @@ export const ERROR_CODES = {
   NETWORK_ERROR: 'NETWORK_ERROR',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+  /** Supabase error code: The request expected a single row, but 0 rows were returned. */
+  SINGLE_ROW_EXPECTED: 'PGRST116'
 } as const;
 
 export type ErrorCode = typeof ERROR_CODES[keyof typeof ERROR_CODES];
