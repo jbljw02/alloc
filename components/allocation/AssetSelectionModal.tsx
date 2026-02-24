@@ -2,7 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Modal, Text, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '@/constants/colors';
-import { CategoryType } from '@/constants/mock-categories';
+import { CategoryType } from '@/constants/categories';
+import { CATEGORY_TYPES } from '@/constants/categories';
 
 import { AssetListContent } from './AssetListContent';
 import { CustomAssetInput } from './CustomAssetInput';
@@ -10,16 +11,16 @@ import { CustomAssetInput } from './CustomAssetInput';
 interface AssetSelectionModalProps {
   visible: boolean;
   onClose: () => void;
-  onAddAsset: (name: string, category: CategoryType) => void;
+  onAddAsset: (assetId: string | undefined, name: string, category: CategoryType) => void;
 }
 
 export const AssetSelectionModal = ({ visible, onClose, onAddAsset }: AssetSelectionModalProps) => {
   const [isCustomInputMode, setCustomInputMode] = useState(false);
   const [customName, setCustomName] = useState('');
-  const [customCategory, setCustomCategory] = useState<CategoryType>('INVEST');
+  const [customCategory, setCustomCategory] = useState<CategoryType>(CATEGORY_TYPES.INVEST);
 
-  const handleAddAsset = (name: string, category: CategoryType) => {
-    onAddAsset(name, category);
+  const handleAddAsset = (assetId: string | undefined, name: string, category: CategoryType) => {
+    onAddAsset(assetId, name, category);
     setCustomInputMode(false);
     setCustomName('');
   };
@@ -49,7 +50,7 @@ export const AssetSelectionModal = ({ visible, onClose, onAddAsset }: AssetSelec
               onNameChange={setCustomName}
               category={customCategory}
               onCategoryChange={setCustomCategory}
-              onAdd={() => handleAddAsset(customName, customCategory)}
+              onAdd={() => handleAddAsset(undefined, customName, customCategory)}
               onBackToList={() => setCustomInputMode(false)}
             />
           ) : (

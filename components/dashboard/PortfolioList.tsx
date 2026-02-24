@@ -4,10 +4,13 @@ import { Text, View } from 'react-native';
 import { COLORS } from '@/constants/colors';
 import { formatNumber } from '@/utils/formatters';
 import { Asset } from '@/types/domain/asset';
+import { CATEGORY_TYPES } from '@/constants/categories';
 
 interface PortfolioListProps {
   assets: Asset[];
 }
+
+const HEX_OPACITY_8_PERCENT = '15';
 
 export const PortfolioList = ({ assets }: PortfolioListProps) => {
   return (
@@ -15,7 +18,7 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
       <Text className="text-[17px] font-bold text-gray-900 mb-4">포트폴리오 상세</Text>
 
       {assets.map((item) => {
-        const isInvest = item.category === 'INVEST';
+        const isInvest = item.category === CATEGORY_TYPES.INVEST;
         const iconColor = item.color ?? COLORS.primary;
         const iconName = item.iconName ?? 'wallet';
 
@@ -28,7 +31,7 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
             <View className="flex-row items-center">
               <View
                 className="w-11 h-11 rounded-[14px] items-center justify-center mr-3.5"
-                style={{ backgroundColor: iconColor + '15' }}
+                style={{ backgroundColor: iconColor + HEX_OPACITY_8_PERCENT }}
               >
                 <Ionicons name={isInvest ? iconName : 'wallet'} size={20} color={iconColor} />
               </View>

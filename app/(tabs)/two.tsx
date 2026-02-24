@@ -4,7 +4,7 @@ import { AllocationFooter } from '../../components/allocation/AllocationFooter';
 import { AllocationItem, AllocationList } from '../../components/allocation/AllocationList';
 import { AssetSelectionModal } from '../../components/allocation/AssetSelectionModal';
 import { IncomeInput } from '../../components/allocation/IncomeInput';
-import { CategoryType } from '@/constants/mock-categories';
+import { CategoryType } from '@/constants/categories';
 import { formatNumber } from '@/utils/formatters';
 
 export default function AllocationScreen() {
@@ -33,8 +33,9 @@ export default function AllocationScreen() {
     setItems([]);
   };
 
-  const handleAddAsset = (name: string, category: CategoryType) => {
-    const newItem: AllocationItem = { id: Date.now().toString(), name, category, amount: '' };
+  const handleAddAsset = (assetId: string | undefined, name: string, category: CategoryType) => {
+    const date = Date.now().toString();
+    const newItem: AllocationItem = { id: date, assetId, name, category, amount: '' };
     setItems((prev) => [...prev, newItem]);
     setModalVisible(false);
   };
