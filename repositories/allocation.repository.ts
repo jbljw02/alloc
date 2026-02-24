@@ -62,6 +62,24 @@ export const allocationRepository = {
     return toAllocationDTO(data);
   },
 
+  async bulkCreateAllocation(allocations: Partial<Allocation>[]): Promise<Allocation[]> {
+    const rows = allocations.map(toAllocationRow);
+    const { data, error } = await supabase
+      .from('allocations')
+      .insert(rows)
+      .select();
+
+    if (error) {
+      throw new AppError(`자산 일괄 배분에 실패했습니다: ${error.message}`, ERROR_CODES.VALIDATION_ERROR, error);
+    }
+
+    if (isNil(data)) {
+      throw new AppError('자산 일괄 배분 후 데이터를 가져오지 못했습니다.', ERROR_CODES.UNKNOWN_ERROR);
+    }
+
+    return data.map(toAllocationDTO);
+  },
+
   async updateAllocation(id: string, allocation: Partial<Allocation>): Promise<Allocation> {
     const row = toAllocationRow(allocation);
     const { data, error } = await supabase

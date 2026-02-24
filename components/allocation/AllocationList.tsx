@@ -6,6 +6,7 @@ import { CATEGORY_CONFIG, CategoryType } from '@/constants/mock-categories';
 
 export interface AllocationItem {
   id: string;
+  assetId?: string; // 아직 DB에 추가되지 않은 자산은 ID가 없기 때문에 optional
   name: string;
   category: CategoryType;
   amount: string;
