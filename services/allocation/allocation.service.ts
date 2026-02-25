@@ -23,7 +23,7 @@ const resolveAssetId = async (item: AllocationItem): Promise<string> => {
 };
 
 export const saveAllocations = async (items: AllocationItem[]) => {
-  const currentMonth = formatDate(new Date(), 'yyyy-MM');
+  const currentMonth = formatDate(new Date(), 'yyyy-MM-dd');
 
   const validItems = items.filter((item) => {
     const amount = parseNumber(item.amount);

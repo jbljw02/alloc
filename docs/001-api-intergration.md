@@ -91,7 +91,7 @@ export const useSaveAllocation = () =>
 
 - DB에 등록된 자산: `assetId` 직접 사용 → `createAllocation`
 - 커스텀 자산 (DB 미등록): `createAsset` 실행 후 반환된 `id`로 `createAllocation`
-- `allocationMonth`: 현재 년월 (`YYYY-MM` 포맷)
+- `allocationMonth`: 현재 년월 (`YYYY-MM-DD` 포맷, DB DATE 타입 호환)
 - 저장 성공 시 `assets` 쿼리 자동 무효화 → 대시보드 자동 갱신
 
 ---
