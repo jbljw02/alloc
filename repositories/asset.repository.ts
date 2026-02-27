@@ -82,6 +82,20 @@ export const assetRepository = {
     return toAssetDTO(data);
   },
 
+  async bulkUpdateBalance(updates: { id: string; amount: number }[]): Promise<void> {
+    if (updates.length === 0) {
+      return;
+    }
+
+    const { error } = await supabase.rpc('bulk_update_asset_balances', {
+      updates
+    });
+
+    if (error) {
+      throw new AppError(`자산 잔액 일괄 업데이트에 실패했습니다.`, ERROR_CODES.NETWORK_ERROR, error);
+    }
+  },
+
   async deleteAsset(id: string): Promise<void> {
     const { error } = await supabase
       .from('assets')

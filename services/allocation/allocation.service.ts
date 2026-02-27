@@ -47,6 +47,12 @@ export const saveAllocations = async (items: AllocationItem[]) => {
     })
   );
 
-  // 2. 확보된 데이터를 한 번의 쿼리로 Bulk Insert 합니다.
   await allocationRepository.bulkCreateAllocation(allocationPayloads);
+
+  const balanceUpdates = allocationPayloads.map(payload => ({
+    id: payload.assetId,
+    amount: payload.inputAmount
+  }));
+  
+  await assetRepository.bulkUpdateBalance(balanceUpdates);
 };

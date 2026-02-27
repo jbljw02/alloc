@@ -174,3 +174,50 @@ const handleSave = () => saveAllocation(items);
 | `components/allocation/AssetListContent.tsx` | mock 제거, `useAssets` 연결 |
 | `components/allocation/AssetSelectionModal.tsx` | `onAddAsset` 시그니처 갱신 |
 | `app/(tabs)/two.tsx` | `AllocationItem` 확장, `handleSave` 구현 |
+
+---
+
+### Step 8: Supabase RPC (Bulk Update Asset Balances)
+
+동시성 문제(Race Condition)를 방지하고 트랜잭션의 원자성(Atomicity)을 보장하기 위해, 자산 잔액 일괄 업데이트에 사용되는 데이터베이스 함수
+
+#### 적용 방법
+Supabase 대시보드의 **SQL Editor**에 접속하여 아래의 SQL 코드를 복사해서 실행(Run)
+
+```sql
+create or replace function bulk_update_asset_balances(
+  updates jsonb
+) returns void language plpgsql as $$
+begin
+  update assets
+  set current_balance = current_balance + item.amount
+  from jsonb_to_recordset(updates) as item(id uuid, amount numeric)
+  where assets.id = item.id;
+end;
+$$;
+```
+
+> **참고**: 이 함수는 `updates`라는 JSON 배열을 파라미터로 받아서, 각 객체의 `id`에 해당하는 자산을 찾고 `amount`만큼 `current_balance`에 합산
+
+#### 쿼리 구문 상세 분석
+
+##### 1. `CREATE OR REPLACE FUNCTION`
+데이터베이스 마이그레이션 및 배포 시 **멱등성(Idempotency)**을 보장하기 위한 표준 DDL 패턴
+
+* **`CREATE`**: 새로운 저장 프로시저(함수)를 데이터베이스에 정의.
+* **`OR REPLACE`**: 동일한 시그니처를 가진 함수가 이미 존재할 경우, 충돌 에러를 발생시키는 대신 새로운 정의로 안전하게 덮어씌움. 기존 함수에 부여된 권한(Grants)이나 의존성이 파괴되지 않고 그대로 유지됨.
+
+##### 2. `UPDATE ... SET ... FROM ... WHERE`
+단일 쿼리로 여러 행을 일괄 수정(Bulk Update)할 때 사용하는 PostgreSQL의 확장 문법. 쿼리 실행 엔진은 이 구문들을 결합하여 타겟 테이블과 데이터 소스를 조인한 뒤 업데이트를 수행.
+
+* **`UPDATE assets` (타겟 지정)**
+  수정할 대상 테이블을 선언. 실행 시 이 테이블의 해당 행(Row)들에 대해 쓰기 잠금(Row-level Write Lock)을 획득하여 트랜잭션의 안전성을 확보.
+
+* **`SET current_balance = current_balance + item.amount` (원자적 연산)**
+  변경할 컬럼과 새로운 값을 정의. 애플리케이션 메모리로 값을 가져오지 않고 DB 엔진 내부에서 기존 값에 직접 덧셈 연산을 수행하므로, 동시성 처리 시 발생할 수 있는 경쟁 상태(Race Condition)를 원천적으로 차단.
+
+* **`FROM jsonb_to_recordset(updates) AS item(...)` (데이터 소스 주입)**
+  업데이트에 사용할 조인 대상(데이터 소스)을 제공. 파라미터로 받은 JSON 배열을 RDBMS가 이해할 수 있는 메모리 상의 임시 가상 테이블(이름: `item`)로 전개(Unnesting)하여 `UPDATE` 문 내부에서 활용할 수 있게 함.
+
+* **`WHERE assets.id = item.id` (조인 및 필터링 조건)**
+  타겟 테이블(`assets`)과 `FROM` 절에서 만든 가상 테이블(`item`)을 매핑하는 조건. 내부적으로 두 테이블을 `INNER JOIN` 하는 것과 같은 실행 계획(Execution Plan)을 가지며, 일치하는 레코드에 대해서만 `SET` 연산을 트리거.
