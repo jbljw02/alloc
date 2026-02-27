@@ -14,7 +14,7 @@ This file defines the specific instructions and standards for Gemini CLI in the 
 ### 2. Logic & Control Flow
 - Always use curly braces `{}` for `if` statements.
 - Use explicit boolean values in conditions.
-- Null checks: `== null` for both `null` and `undefined`.
+- Null checks & Validations: Always use `@/utils/validators.ts` when applicable (e.g., `isNil`, `isNotEmptyArray`, `isEmptyString`). Avoid raw `length === 0` or `== null` checks if a validator exists.
 - Use strict equality `===` for all other comparisons.
 - Prefer early returns over `else` blocks.
 - Use `??` (Nullish Coalescing) by default.

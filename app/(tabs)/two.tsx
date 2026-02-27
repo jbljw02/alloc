@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView } from 'react-native';
 import { AllocationFooter } from '../../components/allocation/AllocationFooter';
 import { AllocationItem, AllocationList } from '../../components/allocation/AllocationList';
 import { AssetSelectionModal } from '../../components/allocation/AssetSelectionModal';
 import { IncomeInput } from '../../components/allocation/IncomeInput';
-import { CategoryType } from '@/constants/mock-categories';
+import { CategoryType } from '@/constants/categories';
 import { formatNumber } from '@/utils/formatters';
+import { useSaveAllocation } from '@/hooks/useSaveAllocation';
+import { isEmptyArray } from '@/utils/validators';
 
 export default function AllocationScreen() {
   const [income, setIncome] = useState('');
   const [items, setItems] = useState<AllocationItem[]>([]);
   const [isModalVisible, setModalVisible] = useState(false);
+
+  const { mutate: saveAllocation, isPending } = useSaveAllocation();
 
   const totalIncome = parseInt(income.replace(/,/g, '') ?? '0');
   const totalAllocated = items.reduce((sum, item) => sum + parseInt(item.amount.replace(/,/g, '') ?? '0'), 0);
@@ -33,14 +37,35 @@ export default function AllocationScreen() {
     setItems([]);
   };
 
-  const handleAddAsset = (name: string, category: CategoryType) => {
-    const newItem: AllocationItem = { id: Date.now().toString(), name, category, amount: '' };
+  const handleAddAsset = (assetId: string | undefined, name: string, category: CategoryType) => {
+    const date = Date.now().toString();
+    const newItem: AllocationItem = { id: date, assetId, name, category, amount: '' };
     setItems((prev) => [...prev, newItem]);
     setModalVisible(false);
   };
 
   const handleSave = () => {
-    // TODO: 배분 완료 로직
+    if (isEmptyArray(items)) {
+      Alert.alert('알림', '배분할 자산을 추가해주세요.');
+      return;
+    }
+
+    saveAllocation(items, {
+      onSuccess: () => {
+        Alert.alert('성공', '변경사항이 저장되었습니다.', [
+          {
+            text: '확인',
+            onPress: () => {
+              setItems([]);
+              setIncome('');
+            },
+          },
+        ]);
+      },
+      onError: () => {
+        Alert.alert('오류', '저장에 실패했습니다. 다시 시도해주세요.');
+      },
+    });
   };
 
   return (
@@ -62,6 +87,7 @@ export default function AllocationScreen() {
           remaining={remaining}
           progressPercent={progressPercent}
           totalIncome={totalIncome}
+          isLoading={isPending}
           onSave={handleSave}
         />
 

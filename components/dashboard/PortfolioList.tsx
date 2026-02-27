@@ -3,11 +3,14 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { COLORS } from '@/constants/colors';
 import { formatNumber } from '@/utils/formatters';
-import { Asset } from '@/constants/mock-dashboard';
+import { Asset } from '@/types/domain/asset';
+import { CATEGORY_TYPES } from '@/constants/categories';
 
 interface PortfolioListProps {
   assets: Asset[];
 }
+
+const HEX_OPACITY_8_PERCENT = '15';
 
 export const PortfolioList = ({ assets }: PortfolioListProps) => {
   return (
@@ -15,8 +18,10 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
       <Text className="text-[17px] font-bold text-gray-900 mb-4">포트폴리오 상세</Text>
 
       {assets.map((item) => {
-        const isInvest = item.category === 'INVEST';
-        const isPositiveProfit = item.profit.includes('+');
+        const isInvest = item.category === CATEGORY_TYPES.INVEST;
+        const iconColor = item.color ?? COLORS.primary;
+        const iconName = item.iconName ?? 'wallet';
+
         return (
           <View
             key={item.id}
@@ -26,9 +31,9 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
             <View className="flex-row items-center">
               <View
                 className="w-11 h-11 rounded-[14px] items-center justify-center mr-3.5"
-                style={{ backgroundColor: item.color + '15' }}
+                style={{ backgroundColor: iconColor + HEX_OPACITY_8_PERCENT }}
               >
-                <Ionicons name={isInvest ? item.icon : 'wallet'} size={20} color={item.color} />
+                <Ionicons name={isInvest ? iconName : 'wallet'} size={20} color={iconColor} />
               </View>
               <View>
                 <View className="flex-row items-center mb-1">
@@ -39,15 +44,9 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
                     </Text>
                   </View>
                 </View>
-                <Text
-                  className="text-xs font-medium mt-0.5"
-                  style={{ color: isPositiveProfit ? COLORS.increase : COLORS.decrease }}
-                >
-                  수익률 {item.profit}
-                </Text>
               </View>
             </View>
-            <Text className="text-base font-bold text-gray-900">{formatNumber(item.amount)}</Text>
+            <Text className="text-base font-bold text-gray-900">{formatNumber(item.currentBalance ?? 0)}</Text>
           </View>
         );
       })}
