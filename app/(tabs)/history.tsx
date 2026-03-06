@@ -10,7 +10,9 @@ import { ActivityIndicator, SafeAreaView, ScrollView, Text, TouchableOpacity, Vi
 const HEX_OPACITY_8_PERCENT = '15';
 const formatAmount = (value: number) => value.toLocaleString('ko-KR');
 const shiftMonth = (date: Date, amount: number) => new Date(date.getFullYear(), date.getMonth() + amount, 1);
-const CATEGORY_FILTERS: Array<{ key: 'ALL' | CategoryType; label: string }> = [
+type AllocationHistoryFilter = CategoryType | 'ALL';
+
+const CATEGORY_FILTERS: Array<{ key: AllocationHistoryFilter; label: string }> = [
   { key: 'ALL', label: '전체' },
   { key: CATEGORY_TYPES.INVEST, label: '투자' },
   { key: CATEGORY_TYPES.CASH, label: '현금' },
@@ -24,7 +26,11 @@ export default function AllocationHistoryScreen() {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
-  const [selectedFilter, setSelectedFilter] = useState<'ALL' | CategoryType>('ALL');
+  const [selectedFilter, setSelectedFilter] = useState<AllocationHistoryFilter>('ALL');
+  const handleMonthChange = (amount: number) => {
+    setSelectedMonth((prev) => shiftMonth(prev, amount));
+    setSelectedFilter('ALL');
+  };
 
   const currentMonth = new Date();
   const currentMonthDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
@@ -108,7 +114,7 @@ export default function AllocationHistoryScreen() {
         <View className="bg-white rounded-2xl px-4 py-4 mb-4 flex-row items-center justify-between">
           <TouchableOpacity
             className="w-10 h-10 rounded-full bg-gray-100 items-center justify-center"
-            onPress={() => setSelectedMonth((prev) => shiftMonth(prev, -1))}
+            onPress={() => handleMonthChange(-1)}
           >
             <Ionicons name="chevron-back" size={20} color={COLORS.secondaryDark} />
           </TouchableOpacity>
@@ -120,7 +126,7 @@ export default function AllocationHistoryScreen() {
 
           <TouchableOpacity
             className={`w-10 h-10 rounded-full items-center justify-center ${isCurrentMonth ? 'bg-gray-100' : 'bg-primary-light'}`}
-            onPress={() => setSelectedMonth((prev) => shiftMonth(prev, 1))}
+            onPress={() => handleMonthChange(1)}
             disabled={isCurrentMonth}
           >
             <Ionicons name="chevron-forward" size={20} color={isCurrentMonth ? '#9CA3AF' : COLORS.primary} />
