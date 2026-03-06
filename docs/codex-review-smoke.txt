@@ -1,0 +1,2 @@
+Codex connector review smoke-test PR.
+This file exists only to trigger and verify automatic review behavior.
