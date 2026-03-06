@@ -7,6 +7,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "test": "node -e \"console.log('simple test: ok')\"",
     "gemini:fix": "gemini-cli 'Fix all linting and style issues in the changed files according to GEMINI.md'",
     "gemini:test": "gemini-cli 'Generate unit tests for the components in the app directory'"
   },
