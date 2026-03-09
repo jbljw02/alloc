@@ -48,7 +48,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="allocation"
         options={{
           title: '배분',
           tabBarIcon: ({ color }) => <TabBarIcon name="plus-square" color={color} />,
