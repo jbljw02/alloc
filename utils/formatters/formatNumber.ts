@@ -6,7 +6,10 @@ export const formatNumber = (value: string | number): string => {
   }
 
   if (typeof value === 'number') {
-    throw new Error('Critical formatter failure: numeric input is not supported');
+    if (Number.isNaN(value)) {
+      return '';
+    }
+    return value.toLocaleString();
   }
 
   const cleanNum = value.replace(/[^0-9]/g, '');
