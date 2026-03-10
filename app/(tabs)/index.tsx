@@ -3,12 +3,14 @@ import { SummaryCards } from '@/components/dashboard/SummaryCards';
 import { TotalAssetsChart } from '@/components/dashboard/TotalAssetsChart';
 import { useAssets } from '@/hooks/useAssets';
 import { supabase } from '@/lib/supabase';
+import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { ActivityIndicator, Alert, SafeAreaView, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '@/constants/colors';
 import { CATEGORY_TYPES } from '@/constants/categories';
 
 export default function HomeScreen() {
+  const queryClient = useQueryClient();
   const { data: assets = [], isLoading, error, refetch } = useAssets();
 
   const handleSignOut = async () => {
@@ -16,7 +18,10 @@ export default function HomeScreen() {
 
     if (signOutError != null) {
       Alert.alert('오류', '로그아웃에 실패했습니다.');
+      return;
     }
+
+    queryClient.clear();
   };
 
   if (isLoading) {
