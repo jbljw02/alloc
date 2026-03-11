@@ -7,8 +7,10 @@ export const useSaveAllocation = () => {
   return useMutation({
     mutationFn: saveAllocations,
     onSuccess: () => {
-      // 대시보드 및 자산 목록 관련 쿼리 무효화(자동 갱신 유도)
-      queryClient.invalidateQueries({ queryKey: ['assets'] });
+      void Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['assets'] }),
+        queryClient.invalidateQueries({ queryKey: ['allocations'] }),
+      ]);
     },
   });
 };
