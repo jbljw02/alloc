@@ -39,9 +39,16 @@ export const ALLOCATION_HISTORY_FILTERS: AllocationHistoryFilterOption[] = [
   { key: CATEGORY_TYPES.SPEND, label: '소비' },
 ];
 
+export const getMonthKey = (date: Date): string => {
+  return formatDate(date, 'yyyy-MM');
+};
+
 export const getInitialSelectedMonth = (): Date => {
   const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), 1);
+  const normalizedYear = Number(formatDate(now, 'yyyy'));
+  const normalizedMonthIndex = Number(formatDate(now, 'M')) - 1;
+
+  return new Date(normalizedYear, normalizedMonthIndex, 1);
 };
 
 export const shiftMonth = (date: Date, amount: number): Date => {
@@ -52,9 +59,9 @@ export const getMonthLabels = (selectedMonth: Date) => {
   const previousMonth = shiftMonth(selectedMonth, -1);
 
   return {
-    previousMonthKey: formatDate(previousMonth, 'yyyy-MM'),
+    previousMonthKey: getMonthKey(previousMonth),
     previousMonthLabel: formatDate(previousMonth, 'M월'),
-    selectedMonthKey: formatDate(selectedMonth, 'yyyy-MM'),
+    selectedMonthKey: getMonthKey(selectedMonth),
     selectedMonthLabel: formatDate(selectedMonth, 'yyyy년 M월'),
   };
 };

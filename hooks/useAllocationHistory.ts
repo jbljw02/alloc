@@ -9,6 +9,7 @@ import {
   getFilteredHistoryItems,
   getHistoryItems,
   getInitialSelectedMonth,
+  getMonthKey,
   getMonthLabels,
   getPreviousMonthTotalAmount,
   getTotalAmount,
@@ -25,7 +26,7 @@ export const useAllocationHistory = ({ allocations, assets }: UseAllocationHisto
   const [selectedMonth, setSelectedMonth] = useState<Date>(getInitialSelectedMonth);
   const [selectedFilter, setSelectedFilter] = useState<AllocationHistoryFilter>(ALL_FILTER);
 
-  const currentMonth = getInitialSelectedMonth();
+  const currentMonthKey = getMonthKey(new Date());
   const { previousMonthKey, previousMonthLabel, selectedMonthKey, selectedMonthLabel } = getMonthLabels(selectedMonth);
   const selectedMonthAllocations = getAllocationsByMonth(allocations, selectedMonthKey);
   const previousMonthAllocations = getAllocationsByMonth(allocations, previousMonthKey);
@@ -36,7 +37,7 @@ export const useAllocationHistory = ({ allocations, assets }: UseAllocationHisto
   const monthDiff = totalAmount - previousMonthTotalAmount;
   const hasPreviousMonthData = previousMonthAllocations.length > 0;
   const categoryTotals = getCategoryTotals(historyItems);
-  const isCurrentMonth = selectedMonth.getTime() === currentMonth.getTime();
+  const isCurrentMonth = selectedMonthKey === currentMonthKey;
 
   const handleMonthChange = (amount: number) => {
     setSelectedMonth((prevSelectedMonth) => shiftMonth(prevSelectedMonth, amount));
