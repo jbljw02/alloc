@@ -39,8 +39,8 @@ export default function AllocationHistoryScreen() {
     <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
         <View className="mb-6">
-          <Text className="text-[28px] font-bold text-gray-900">배분 내역</Text>
-          <Text className="text-sm text-gray-500 mt-1">{navigation.selectedMonthLabel} 자금 배분 흐름</Text>
+          <Text className="text-[28px] font-bold text-gray-900">자금 흐름</Text>
+          <Text className="text-sm text-gray-500 mt-1">월별 자금 이동</Text>
         </View>
 
         <View className="bg-white rounded-2xl px-4 py-4 mb-4 flex-row items-center justify-between">
@@ -53,7 +53,6 @@ export default function AllocationHistoryScreen() {
 
           <View className="items-center">
             <Text className="text-lg font-bold text-gray-900">{navigation.selectedMonthLabel}</Text>
-            <Text className="text-xs text-gray-400 mt-1">월별 배분 조회</Text>
           </View>
 
           <TouchableOpacity
@@ -67,7 +66,6 @@ export default function AllocationHistoryScreen() {
 
         <HistorySummaryCard
           hasPreviousMonthData={summary.hasPreviousMonthData}
-          historyCount={list.historyCount}
           monthDiff={summary.monthDiff}
           previousMonthLabel={summary.previousMonthLabel}
           selectedMonthLabel={navigation.selectedMonthLabel}
@@ -134,7 +132,7 @@ export default function AllocationHistoryScreen() {
         </ScrollView>
 
         <View className="mb-3">
-          <Text className="text-[17px] font-bold text-gray-900">{navigation.selectedMonthLabel} 배분 항목</Text>
+          <Text className="text-[17px] font-bold text-gray-900">{navigation.selectedMonthLabel} 배분 내역</Text>
         </View>
 
         <HistoryItemList
