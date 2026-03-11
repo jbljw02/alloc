@@ -74,13 +74,33 @@ export default function AllocationHistoryScreen() {
           totalAmount={summary.totalAmount}
         />
 
-        <View className="flex-row flex-wrap justify-between mb-5">
-          {summary.categoryTotals.map((item) => (
-            <View key={item.category} className="bg-white rounded-2xl p-4 w-[48%] mb-3">
-              <Text className="text-sm text-gray-500 mb-1">{CATEGORY_CONFIG[item.category].label}</Text>
-              <Text className="text-[18px] font-bold text-gray-900">{formatAmount(item.amount)}원</Text>
-            </View>
-          ))}
+        <View className="bg-white rounded-[28px] px-5 py-4 mb-5">
+          {summary.categoryTotals.map((item, index) => {
+            const isLastItem = index === summary.categoryTotals.length - 1;
+            const categoryConfig = CATEGORY_CONFIG[item.category];
+
+            return (
+              <View
+                key={item.category}
+                className={`flex-row items-center justify-between py-4 ${isLastItem ? '' : 'border-b border-gray-100'}`}
+              >
+                <View className="flex-row items-center">
+                  <View
+                    className="w-10 h-10 rounded-2xl items-center justify-center mr-3"
+                    style={{ backgroundColor: `${categoryConfig.color}20` }}
+                  >
+                    <Ionicons
+                      name={categoryConfig.icon}
+                      size={18}
+                      color={categoryConfig.color}
+                    />
+                  </View>
+                  <Text className="text-sm text-gray-500">{categoryConfig.label}</Text>
+                </View>
+                <Text className="text-[18px] font-bold text-gray-900">{formatAmount(item.amount)}원</Text>
+              </View>
+            );
+          })}
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
