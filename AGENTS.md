@@ -1,6 +1,6 @@
-# Gemini CLI Project Instructions - Alloc
+# AI Agent Instructions - Alloc
 
-This file defines the specific instructions and standards for Gemini CLI in the Alloc project.
+This file defines the instructions and standards that AI agents must follow in the Alloc project.
 
 ## Core Standards (Derived from .cursorrules)
 
@@ -45,13 +45,11 @@ This file defines the specific instructions and standards for Gemini CLI in the 
 - **No Unsolicited Work**: Do not initiate tasks or modifications that were not specifically requested.
 - **Plan-First Approach**: Before making any file edits, provide a concise summary of the planned changes and wait for user approval.
 
-## Gemini Automation Workflow
+## Pull Request Rules
 
-### Local Automation
-- Use `npm run gemini:fix` to automatically align changed files with these standards.
-- Use `npm run gemini:test` to generate unit tests for new components.
+- **PR Template Required**: Before creating or updating a Pull Request, open `.github/PULL_REQUEST_TEMPLATE.md` and follow its structure exactly. Do not use an arbitrary title or description format when a repository template exists.
 
-### GitHub Integration
-- Gemini is configured to review PRs and triage issues via GitHub Actions.
-- Trigger manual review: `@gemini-cli /review`
-- Trigger custom automation: `@gemini-cli [instruction]`
+## Documentation Rules
+
+- **Documentation Tone**: When adding or editing project documentation, write in an imperative tone.
+- **Prohibited Documentation Style**: Do not use explanatory ending forms such as `-한다`, `-합니다`, `-해야 합니다` in project documentation.
