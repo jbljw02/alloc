@@ -7,6 +7,8 @@ import { ALL_FILTER } from '@/hooks/history/allocationHistory';
 import { useAssets } from '@/hooks/useAssets';
 import { useAllocationHistory } from '@/hooks/useAllocationHistory';
 import { useAllocations } from '@/hooks/useAllocations';
+import { useSaveAllocation } from '@/hooks/useSaveAllocation';
+import { getAllocationMonthValue } from '@/services/allocation/allocation.service';
 import { formatAmount } from '@/utils/formatters';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
@@ -16,10 +18,27 @@ export default function AllocationHistoryScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
   const { data: allocations = [], isLoading: isAllocationsLoading, error: allocationsError } = useAllocations();
   const { data: assets = [], isLoading: isAssetsLoading, error: assetsError } = useAssets();
-  const { editor, filters, list, navigation, summary } = useAllocationHistory({
+  const { mutate: saveAllocation, isPending } = useSaveAllocation();
+  const { editor, filters, list, navigation, selectedMonthAllocations, summary } = useAllocationHistory({
     allocations,
     assets,
   });
+
+  const handleSave = () => {
+    saveAllocation({
+      allocationMonth: getAllocationMonthValue(navigation.selectedMonth),
+      existingAllocations: selectedMonthAllocations,
+      items: editor.allItems,
+    }, {
+      onSuccess: () => {
+        editor.handleCancelEditing();
+        Alert.alert('성공', '변경사항이 저장되었습니다.');
+      },
+      onError: () => {
+        Alert.alert('오류', '저장에 실패했습니다. 다시 시도해주세요.');
+      },
+    });
+  };
 
   if (isAllocationsLoading || isAssetsLoading) {
     return (
@@ -144,9 +163,10 @@ export default function AllocationHistoryScreen() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   className="px-3 py-2 rounded-full bg-primary-light"
-                  onPress={() => Alert.alert('준비 중', '저장 기능은 다음 커밋에서 연결합니다.')}
+                  onPress={handleSave}
+                  disabled={isPending}
                 >
-                  <Text className="text-xs font-semibold text-primary">저장</Text>
+                  <Text className="text-xs font-semibold text-primary">{isPending ? '저장 중' : '저장'}</Text>
                 </TouchableOpacity>
               </View>
             ) : (

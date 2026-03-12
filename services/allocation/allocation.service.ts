@@ -1,58 +1,144 @@
+import { CATEGORY_CONFIG } from '@/constants/categories';
+import { CategoryType } from '@/constants/categories';
 import { allocationRepository } from '@/repositories/allocation.repository';
 import { assetRepository } from '@/repositories/asset.repository';
-import { AllocationItem } from '@/components/allocation/AllocationList';
-import { CATEGORY_CONFIG } from '@/constants/mock-categories';
+import { Allocation } from '@/types/domain/allocation';
 import { formatDate, parseNumber } from '@/utils/formatters';
-import { isEmptyArray } from '@/utils/validators';
 
-const resolveAssetId = async (item: AllocationItem): Promise<string> => {
+export interface SaveAllocationItem {
+  id: string;
+  assetId?: string;
+  name: string;
+  amount: string;
+  category: CategoryType;
+}
+
+interface SaveAllocationParams {
+  allocationMonth: string;
+  existingAllocations: Allocation[];
+  items: SaveAllocationItem[];
+}
+
+interface BalanceUpdate {
+  amount: number;
+  id: string;
+}
+
+const resolveAssetId = async (item: SaveAllocationItem): Promise<string> => {
   if (item.assetId) {
     return item.assetId;
   }
 
   const config = CATEGORY_CONFIG[item.category];
   const newAsset = await assetRepository.createAsset({
-    name: item.name,
     category: item.category,
+    color: config.color,
     currentBalance: 0,
-    iconName: config?.icon ?? null,
-    color: config?.color ?? null,
+    iconName: config.icon,
+    name: item.name,
   });
 
   return newAsset.id;
 };
 
-export const saveAllocations = async (items: AllocationItem[]) => {
-  const currentMonth = formatDate(new Date(), 'yyyy-MM-dd');
+const normalizeAllocationMonth = (allocationMonth: string): string => {
+  return `${allocationMonth}-01`;
+};
 
-  const validItems = items.filter((item) => {
-    const amount = parseNumber(item.amount);
-    return amount > 0;
-  });
+const createBalanceUpdateMap = (updates: BalanceUpdate[]): Map<string, number> => {
+  return updates.reduce((map, update) => {
+    const currentAmount = map.get(update.id) ?? 0;
+    map.set(update.id, currentAmount + update.amount);
 
-  if (isEmptyArray(validItems)) {
+    return map;
+  }, new Map<string, number>());
+};
+
+const toBalanceUpdates = (updates: Map<string, number>): BalanceUpdate[] => {
+  return Array.from(updates.entries())
+    .filter(([, amount]) => amount !== 0)
+    .map(([id, amount]) => ({
+      amount,
+      id,
+    }));
+};
+
+export const saveAllocations = async ({
+  allocationMonth,
+  existingAllocations,
+  items,
+}: SaveAllocationParams) => {
+  const normalizedAllocationMonth = normalizeAllocationMonth(allocationMonth);
+  const validItems = items.filter((item) => parseNumber(item.amount) > 0);
+  const existingAllocationMap = new Map(existingAllocations.map((allocation) => [allocation.id, allocation]));
+  const nextBalanceUpdates: BalanceUpdate[] = [];
+  const processedAllocationIds = new Set<string>();
+
+  for (const item of validItems) {
+    const assetId = await resolveAssetId(item);
+    const inputAmount = parseNumber(item.amount);
+    const existingAllocation = existingAllocationMap.get(item.id);
+
+    if (existingAllocation) {
+      processedAllocationIds.add(existingAllocation.id);
+
+      const amountDiff = inputAmount - existingAllocation.inputAmount;
+      if (amountDiff !== 0) {
+        nextBalanceUpdates.push({
+          amount: amountDiff,
+          id: assetId,
+        });
+      }
+
+      const shouldUpdateAllocation = existingAllocation.assetId !== assetId
+        || existingAllocation.inputAmount !== inputAmount
+        || existingAllocation.allocationMonth !== normalizedAllocationMonth;
+
+      if (shouldUpdateAllocation) {
+        await allocationRepository.updateAllocation(existingAllocation.id, {
+          allocationMonth: normalizedAllocationMonth,
+          assetId,
+          inputAmount,
+        });
+      }
+
+      continue;
+    }
+
+    await allocationRepository.createAllocation({
+      allocationMonth: normalizedAllocationMonth,
+      assetId,
+      inputAmount,
+    });
+
+    nextBalanceUpdates.push({
+      amount: inputAmount,
+      id: assetId,
+    });
+  }
+
+  const removedAllocations = existingAllocations.filter((allocation) => !processedAllocationIds.has(allocation.id));
+
+  await Promise.all(
+    removedAllocations.map(async (allocation) => {
+      await allocationRepository.deleteAllocation(allocation.id);
+      nextBalanceUpdates.push({
+        amount: -allocation.inputAmount,
+        id: allocation.assetId,
+      });
+    }),
+  );
+
+  const balanceUpdateMap = createBalanceUpdateMap(nextBalanceUpdates);
+  const balanceUpdates = toBalanceUpdates(balanceUpdateMap);
+
+  if (balanceUpdates.length === 0) {
     return;
   }
 
-  const allocationPayloads = await Promise.all(
-    validItems.map(async (item) => {
-      const assetId = await resolveAssetId(item);
-      const amount = parseNumber(item.amount);
-
-      return {
-        assetId,
-        inputAmount: amount,
-        allocationMonth: currentMonth,
-      };
-    })
-  );
-
-  await allocationRepository.bulkCreateAllocation(allocationPayloads);
-
-  const balanceUpdates = allocationPayloads.map(payload => ({
-    id: payload.assetId,
-    amount: payload.inputAmount
-  }));
-  
   await assetRepository.bulkUpdateBalance(balanceUpdates);
+};
+
+export const getAllocationMonthValue = (date: Date): string => {
+  return formatDate(date, 'yyyy-MM');
 };
