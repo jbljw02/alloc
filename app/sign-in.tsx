@@ -1,4 +1,3 @@
-import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import { COLORS } from '@/constants/colors';
 import { useAuthSession } from '@/hooks/useAuthSession';
@@ -11,6 +10,9 @@ import { Alert, KeyboardAvoidingView, Platform, SafeAreaView, Text, TouchableOpa
 WebBrowser.maybeCompleteAuthSession();
 
 const GOOGLE_PROVIDER = 'google';
+const APP_SCHEME = 'alloc';
+const GOOGLE_AUTH_CALLBACK_PATH = 'auth/callback';
+const GOOGLE_AUTH_REDIRECT_TO = `${APP_SCHEME}://${GOOGLE_AUTH_CALLBACK_PATH}`;
 
 const extractSessionFromUrl = (url: string) => {
   const parsedUrl = new URL(url.replace('#', '?'));
@@ -48,7 +50,8 @@ export default function SignInScreen() {
       return;
     }
 
-    const redirectTo = Linking.createURL('/');
+    const redirectTo = GOOGLE_AUTH_REDIRECT_TO;
+
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: GOOGLE_PROVIDER,
       options: {
