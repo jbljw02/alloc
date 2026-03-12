@@ -1,3 +1,4 @@
+import { AssetSelectionModal } from '@/components/allocation/AssetSelectionModal';
 import { HistoryItemList } from '@/components/history/HistoryItemList';
 import { HistorySummaryCard } from '@/components/history/HistorySummaryCard';
 import { CATEGORY_CONFIG } from '@/constants/categories';
@@ -8,12 +9,14 @@ import { useAllocationHistory } from '@/hooks/useAllocationHistory';
 import { useAllocations } from '@/hooks/useAllocations';
 import { formatAmount } from '@/utils/formatters';
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, Alert, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 export default function AllocationHistoryScreen() {
+  const [isModalVisible, setModalVisible] = useState(false);
   const { data: allocations = [], isLoading: isAllocationsLoading, error: allocationsError } = useAllocations();
   const { data: assets = [], isLoading: isAssetsLoading, error: assetsError } = useAssets();
-  const { filters, list, navigation, summary } = useAllocationHistory({
+  const { editor, filters, list, navigation, summary } = useAllocationHistory({
     allocations,
     assets,
   });
@@ -132,15 +135,50 @@ export default function AllocationHistoryScreen() {
         </ScrollView>
 
         <View className="mb-3">
-          <Text className="text-[17px] font-bold text-gray-900">{navigation.selectedMonthLabel} 배분 내역</Text>
+          <View className="flex-row items-center justify-between">
+            <Text className="text-[17px] font-bold text-gray-900">{navigation.selectedMonthLabel} 배분 내역</Text>
+            {editor.isEditing ? (
+              <View className="flex-row items-center">
+                <TouchableOpacity className="px-3 py-2 rounded-full bg-gray-200 mr-2" onPress={editor.handleCancelEditing}>
+                  <Text className="text-xs font-semibold text-gray-700">취소</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className="px-3 py-2 rounded-full bg-primary-light"
+                  onPress={() => Alert.alert('준비 중', '저장 기능은 다음 커밋에서 연결합니다.')}
+                >
+                  <Text className="text-xs font-semibold text-primary">저장</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity className="px-3 py-2 rounded-full bg-primary-light" onPress={editor.handleStartEditing}>
+                <Text className="text-xs font-semibold text-primary">편집</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          {editor.isEditing ? (
+            <Text className="text-xs text-gray-500 mt-2">금액 수정, 항목 삭제, 자산 추가까지 먼저 구성했습니다.</Text>
+          ) : null}
         </View>
 
         <HistoryItemList
-          items={list.items}
+          isEditing={editor.isEditing}
+          items={editor.isEditing ? editor.items : list.items}
+          onAddPress={() => setModalVisible(true)}
+          onAmountChange={editor.handleAmountChange}
+          onRemove={editor.handleRemoveItem}
           selectedFilter={filters.selectedFilter}
           selectedMonthLabel={navigation.selectedMonthLabel}
         />
       </ScrollView>
+
+      <AssetSelectionModal
+        visible={isModalVisible}
+        onClose={() => setModalVisible(false)}
+        onAddAsset={(assetId, name, category) => {
+          editor.handleAddAsset(assetId, name, category);
+          setModalVisible(false);
+        }}
+      />
     </SafeAreaView>
   );
 }
