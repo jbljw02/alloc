@@ -1,8 +1,8 @@
-# Gemini CLI Project Instructions - Alloc
+# AI Agent Instructions - Alloc
 
-This file defines the specific instructions and standards for Gemini CLI in the Alloc project.
+This file defines the instructions and standards that AI agents must follow in the Alloc project.
 
-## Core Standards (Derived from .cursorrules)
+## Core Standards
 
 ### 1. Naming & Style
 - Use `camelCase` for functions and variables.
@@ -12,12 +12,14 @@ This file defines the specific instructions and standards for Gemini CLI in the 
 - Constants: `UPPER_SNAKE_CASE`.
 
 ### 2. Logic & Control Flow
-- Always use curly braces `{}` for `if` statements.
-- Use explicit boolean values in conditions.
-- Null checks & Validations: Always use `@/utils/validators.ts` when applicable (e.g., `isNil`, `isNotEmptyArray`, `isEmptyString`). Avoid raw `length === 0` or `== null` checks if a validator exists.
-- Use strict equality `===` for all other comparisons.
-- Prefer early returns over `else` blocks.
-- Use `??` (Nullish Coalescing) by default.
+- **Mandatory Curly Braces `{}`**: Always use curly braces for `if` statements and all function declarations (e.g., `const`, `function`, etc.). Implicit returns are prohibited.
+  - **Bad**: `const formatDate = (param) => new Date(param);`
+  - **Good**: `const formatDate = (param) => { return new Date(param); };`
+- **Explicit Boolean Values**: Use explicit boolean values in conditions.
+- **Null Checks & Validations**: Always use `@/utils/validators.ts` when applicable (e.g., `isNil`, `isNotEmptyArray`, `isEmptyString`). Avoid raw `length === 0` or `== null` checks if a validator exists.
+- **Strict Equality**: Use strict equality `===` for all other comparisons.
+- **Prefer Early Returns**: Use early returns over `else` blocks to reduce nesting.
+- **Nullish Coalescing**: Use `??` (Nullish Coalescing) by default for default value assignments.
 
 ### 3. Functional Programming
 - Immutability: Do not reassign variables.
@@ -37,21 +39,11 @@ This file defines the specific instructions and standards for Gemini CLI in the 
 - **Separation of Concerns**: Separate Business Logic (hooks, calculations) from Rendering (JSX).
 - Pre-calculate values in Business Logic Area.
 
-## Operational Principles (Working Rules)
+## Pull Request Rules
 
-- **Surgical Changes**: Only modify files strictly necessary for the assigned task. Avoid unrelated refactoring.
-- **Explicit Git Operations**: Do not perform `git commit`, `push`, or create Pull Requests unless explicitly instructed by the user.
-- **Consult Before Expanding**: If a task requires changes beyond the initial context or if additional improvements are identified, ask for user confirmation before proceeding.
-- **No Unsolicited Work**: Do not initiate tasks or modifications that were not specifically requested.
-- **Plan-First Approach**: Before making any file edits, provide a concise summary of the planned changes and wait for user approval.
+- **PR Template Required**: Before creating or updating a Pull Request, open `.github/PULL_REQUEST_TEMPLATE.md` and follow its structure exactly. Do not use an arbitrary title or description format when a repository template exists.
 
-## Gemini Automation Workflow
+## Documentation Rules
 
-### Local Automation
-- Use `npm run gemini:fix` to automatically align changed files with these standards.
-- Use `npm run gemini:test` to generate unit tests for new components.
-
-### GitHub Integration
-- Gemini is configured to review PRs and triage issues via GitHub Actions.
-- Trigger manual review: `@gemini-cli /review`
-- Trigger custom automation: `@gemini-cli [instruction]`
+- **Documentation Tone**: When adding or editing project documentation, write in an imperative tone.
+- **Prohibited Documentation Style**: Do not use explanatory ending forms such as `-한다`, `-합니다`, `-해야 합니다` in project documentation.
