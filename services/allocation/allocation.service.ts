@@ -82,15 +82,26 @@ export const saveAllocations = async ({
     if (existingAllocation) {
       processedAllocationIds.add(existingAllocation.id);
 
+      const didAssetChange = existingAllocation.assetId !== assetId;
       const amountDiff = inputAmount - existingAllocation.inputAmount;
-      if (amountDiff !== 0) {
+
+      if (didAssetChange) {
+        nextBalanceUpdates.push({
+          amount: -existingAllocation.inputAmount,
+          id: existingAllocation.assetId,
+        });
+        nextBalanceUpdates.push({
+          amount: inputAmount,
+          id: assetId,
+        });
+      } else if (amountDiff !== 0) {
         nextBalanceUpdates.push({
           amount: amountDiff,
           id: assetId,
         });
       }
 
-      const shouldUpdateAllocation = existingAllocation.assetId !== assetId
+      const shouldUpdateAllocation = didAssetChange
         || existingAllocation.inputAmount !== inputAmount
         || existingAllocation.allocationMonth !== normalizedAllocationMonth;
 
