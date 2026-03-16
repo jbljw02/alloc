@@ -17,6 +17,7 @@ export const useSaveAllocation = () => {
       void Promise.all([
         queryClient.invalidateQueries({ queryKey: ['assets'] }),
         queryClient.invalidateQueries({ queryKey: ['allocations'] }),
+        queryClient.invalidateQueries({ queryKey: ['assetSnapshots'] }),
       ]);
     },
   });
