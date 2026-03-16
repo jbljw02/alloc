@@ -1,7 +1,7 @@
 import { CATEGORY_TYPES, CategoryType } from '@/constants/categories';
 import { Allocation } from '@/types/domain/allocation';
 import { Asset } from '@/types/domain/asset';
-import { formatDate } from '@/utils/formatters';
+import { formatDate, formatNumber } from '@/utils/formatters';
 
 export const ALL_FILTER = 'ALL';
 
@@ -15,8 +15,19 @@ export type AllocationHistoryFilter = CategoryType | typeof ALL_FILTER;
 
 export interface AllocationHistoryItem {
   id: string;
+  assetId?: string;
   name: string;
   amount: number;
+  category: CategoryType;
+  assetColor: Asset['color'];
+  assetIconName: Asset['iconName'];
+}
+
+export interface AllocationHistoryEditorItem {
+  id: string;
+  assetId?: string;
+  name: string;
+  amount: string;
   category: CategoryType;
   assetColor: Asset['color'];
   assetIconName: Asset['iconName'];
@@ -79,6 +90,7 @@ export const getHistoryItems = (selectedMonthAllocations: Allocation[], assets: 
 
     return {
       id: allocation.id,
+      assetId: allocation.assetId,
       name: asset?.name ?? '알 수 없는 자산',
       amount: allocation.inputAmount,
       assetColor: asset?.color ?? null,
@@ -92,6 +104,31 @@ export const getFilteredHistoryItems = (
   historyItems: AllocationHistoryItem[],
   selectedFilter: AllocationHistoryFilter,
 ): AllocationHistoryItem[] => {
+  if (selectedFilter === ALL_FILTER) {
+    return historyItems;
+  }
+
+  return historyItems.filter((item) => item.category === selectedFilter);
+};
+
+export const getEditableHistoryItems = (
+  historyItems: AllocationHistoryItem[],
+): AllocationHistoryEditorItem[] => {
+  return historyItems.map((item) => ({
+    id: item.id,
+    assetId: item.assetId,
+    name: item.name,
+    amount: formatNumber(item.amount),
+    category: item.category,
+    assetColor: item.assetColor,
+    assetIconName: item.assetIconName,
+  }));
+};
+
+export const getFilteredEditableHistoryItems = (
+  historyItems: AllocationHistoryEditorItem[],
+  selectedFilter: AllocationHistoryFilter,
+): AllocationHistoryEditorItem[] => {
   if (selectedFilter === ALL_FILTER) {
     return historyItems;
   }
