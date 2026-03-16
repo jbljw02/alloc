@@ -17,9 +17,15 @@ export const TotalAssetsChart = ({ totalAssets, lastMonthDiff, investTotal, cash
   const STROKE_WIDTH = 20;
   const RADIUS = (SIZE - STROKE_WIDTH) / 2;
   const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+  const normalizedTotalAssets = totalAssets > 0 ? totalAssets : 1;
+  const isIncrease = lastMonthDiff > 0;
+  const isDecrease = lastMonthDiff < 0;
+  const diffColor = isIncrease ? COLORS.increase : isDecrease ? COLORS.decrease : COLORS.secondary;
+  const diffBackgroundColor = isIncrease ? '#FEF2F2' : isDecrease ? '#EFF6FF' : '#F3F4F6';
+  const diffIconName = isIncrease ? 'caret-up' : isDecrease ? 'caret-down' : 'remove';
 
-  const investPercent = investTotal / totalAssets;
-  const cashPercent = cashTotal / totalAssets;
+  const investPercent = investTotal / normalizedTotalAssets;
+  const cashPercent = cashTotal / normalizedTotalAssets;
   const investArcLength = CIRCUMFERENCE * investPercent;
   const cashArcLength = CIRCUMFERENCE * cashPercent;
 
@@ -59,9 +65,11 @@ export const TotalAssetsChart = ({ totalAssets, lastMonthDiff, investTotal, cash
         >
           <Text className="text-[13px] text-gray-500 mb-1 font-semibold">총 순자산</Text>
           <Text className="text-[26px] font-extrabold text-gray-900 text-center tracking-tight">{formatNumber(totalAssets)}</Text>
-          <View className="flex-row items-center bg-emerald-light px-2 py-1 rounded-xl mt-2">
-            <Ionicons name="caret-up" size={12} color={COLORS.emerald} />
-            <Text className="text-xs text-emerald font-bold ml-1">{formatNumber(lastMonthDiff)} (지난달)</Text>
+          <View className="flex-row items-center px-2 py-1 rounded-xl mt-2" style={{ backgroundColor: diffBackgroundColor }}>
+            <Ionicons name={diffIconName} size={12} color={diffColor} />
+            <Text className="text-xs font-bold ml-1" style={{ color: diffColor }}>
+              {formatNumber(Math.abs(lastMonthDiff))} (지난달)
+            </Text>
           </View>
         </View>
       </View>

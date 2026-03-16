@@ -1,8 +1,10 @@
 import { CATEGORY_CONFIG } from '@/constants/categories';
 import { CategoryType } from '@/constants/categories';
 import { allocationRepository } from '@/repositories/allocation.repository';
+import { assetSnapshotRepository } from '@/repositories/asset-snapshot.repository';
 import { assetRepository } from '@/repositories/asset.repository';
 import { Allocation } from '@/types/domain/allocation';
+import { Asset } from '@/types/domain/asset';
 import { formatDate, parseNumber } from '@/utils/formatters';
 
 export interface SaveAllocationItem {
@@ -47,6 +49,49 @@ const resolveAssetId = async (item: SaveAllocationItem): Promise<string> => {
 
 const normalizeAllocationMonth = (allocationMonth: string): string => {
   return `${allocationMonth}-01`;
+};
+
+const createAssetSnapshotPayloads = ({
+  assets,
+  snapshotMonth,
+}: {
+  assets: Asset[];
+  snapshotMonth: string;
+}) => {
+  return assets.reduce<Array<{
+    assetId: string;
+    balance: number;
+    snapshotMonth: string;
+    userId: string;
+  }>>((snapshotPayloads, asset) => {
+    if (asset.userId === null) {
+      return snapshotPayloads;
+    }
+
+    return [
+      ...snapshotPayloads,
+      {
+        assetId: asset.id,
+        balance: asset.currentBalance ?? 0,
+        snapshotMonth,
+        userId: asset.userId,
+      },
+    ];
+  }, []);
+};
+
+const syncAssetSnapshots = async (snapshotMonth: string) => {
+  const assets = await assetRepository.getAssets();
+  const snapshotPayloads = createAssetSnapshotPayloads({
+    assets,
+    snapshotMonth,
+  });
+
+  if (snapshotPayloads.length === 0) {
+    return;
+  }
+
+  await assetSnapshotRepository.upsertSnapshots(snapshotPayloads);
 };
 
 const createBalanceUpdateMap = (updates: BalanceUpdate[]): Map<string, number> => {
@@ -249,11 +294,11 @@ export const saveAllocations = async ({
   const balanceUpdateMap = createBalanceUpdateMap(nextBalanceUpdates);
   const balanceUpdates = toBalanceUpdates(balanceUpdateMap);
 
-  if (balanceUpdates.length === 0) {
-    return;
+  if (balanceUpdates.length > 0) {
+    await assetRepository.bulkUpdateBalance(balanceUpdates);
   }
 
-  await assetRepository.bulkUpdateBalance(balanceUpdates);
+  await syncAssetSnapshots(normalizedAllocationMonth);
 };
 
 export const getAllocationMonthValue = (date: Date): string => {

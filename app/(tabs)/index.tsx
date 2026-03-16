@@ -2,13 +2,14 @@ import { PortfolioList } from '@/components/dashboard/PortfolioList';
 import { SummaryCards } from '@/components/dashboard/SummaryCards';
 import { TotalAssetsChart } from '@/components/dashboard/TotalAssetsChart';
 import { useAssets } from '@/hooks/useAssets';
+import { useDashboardSnapshotSummary } from '@/hooks/useDashboardSnapshotSummary';
 import React from 'react';
 import { ActivityIndicator, SafeAreaView, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '@/constants/colors';
-import { CATEGORY_TYPES } from '@/constants/categories';
 
 export default function HomeScreen() {
-  const { data: assets = [], isLoading, error, refetch } = useAssets();
+  const { data: assets = [] } = useAssets();
+  const { cashTotal, error, investTotal, isLoading, lastMonthDiff, refetch, totalAssets } = useDashboardSnapshotSummary();
 
   if (isLoading) {
     return (
@@ -32,15 +33,6 @@ export default function HomeScreen() {
       </SafeAreaView>
     );
   }
-
-  const totalAssets = assets.reduce((sum, a) => sum + (a.currentBalance ?? 0), 0);
-  const investTotal = assets.
-    filter(a => a.category === CATEGORY_TYPES.INVEST)
-    .reduce((sum, a) => sum + (a.currentBalance ?? 0), 0);
-  const cashTotal = assets.
-    filter(a => a.category === CATEGORY_TYPES.CASH)
-    .reduce((sum, a) => sum + (a.currentBalance ?? 0), 0);
-  const lastMonthDiff = 0; // TODO: 전월 대비 자산 증감액 로직 구현 필요
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">

@@ -1,5 +1,6 @@
 import { CATEGORY_TYPES } from '@/constants/categories';
 import { allocationRepository } from '@/repositories/allocation.repository';
+import { assetSnapshotRepository } from '@/repositories/asset-snapshot.repository';
 import { assetRepository } from '@/repositories/asset.repository';
 import { saveAllocations } from '@/services/allocation/allocation.service';
 import { Allocation } from '@/types/domain/allocation';
@@ -16,10 +17,18 @@ jest.mock('@/repositories/asset.repository', () => ({
   assetRepository: {
     bulkUpdateBalance: jest.fn(),
     createAsset: jest.fn(),
+    getAssets: jest.fn(),
+  },
+}));
+
+jest.mock('@/repositories/asset-snapshot.repository', () => ({
+  assetSnapshotRepository: {
+    upsertSnapshots: jest.fn(),
   },
 }));
 
 const mockedAllocationRepository = allocationRepository as jest.Mocked<typeof allocationRepository>;
+const mockedAssetSnapshotRepository = assetSnapshotRepository as jest.Mocked<typeof assetSnapshotRepository>;
 const mockedAssetRepository = assetRepository as jest.Mocked<typeof assetRepository>;
 
 const createAllocationFixture = (overrides: Partial<Allocation>): Allocation => {
@@ -38,6 +47,19 @@ const createAllocationFixture = (overrides: Partial<Allocation>): Allocation => 
 describe('saveAllocations', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockedAssetRepository.getAssets.mockResolvedValue([
+      {
+        category: CATEGORY_TYPES.CASH,
+        color: null,
+        createdAt: null,
+        currentBalance: 1000,
+        iconName: null,
+        id: 'asset-1',
+        name: '입출금',
+        updatedAt: null,
+        userId: 'user-1',
+      },
+    ]);
   });
 
   it('같은 자산의 금액만 변경되면 차액만 잔액에 반영한다', async () => {
@@ -66,6 +88,14 @@ describe('saveAllocations', () => {
       {
         amount: 30,
         id: 'asset-1',
+      },
+    ]);
+    expect(mockedAssetSnapshotRepository.upsertSnapshots).toHaveBeenCalledWith([
+      {
+        assetId: 'asset-1',
+        balance: 1000,
+        snapshotMonth: '2026-03-01',
+        userId: 'user-1',
       },
     ]);
   });
@@ -102,6 +132,7 @@ describe('saveAllocations', () => {
         id: 'asset-new',
       },
     ]);
+    expect(mockedAssetSnapshotRepository.upsertSnapshots).toHaveBeenCalled();
   });
 
   it('신규 배분은 생성 후 해당 자산 잔액을 증가시킨다', async () => {
@@ -130,6 +161,7 @@ describe('saveAllocations', () => {
         id: 'asset-1',
       },
     ]);
+    expect(mockedAssetSnapshotRepository.upsertSnapshots).toHaveBeenCalled();
   });
 
   it('제거된 기존 배분은 삭제 후 기존 자산 잔액을 차감한다', async () => {
@@ -148,5 +180,6 @@ describe('saveAllocations', () => {
         id: 'asset-1',
       },
     ]);
+    expect(mockedAssetSnapshotRepository.upsertSnapshots).toHaveBeenCalled();
   });
 });
