@@ -2,13 +2,19 @@ import { PortfolioList } from '@/components/dashboard/PortfolioList';
 import { SummaryCards } from '@/components/dashboard/SummaryCards';
 import { TotalAssetsChart } from '@/components/dashboard/TotalAssetsChart';
 import { useAssets } from '@/hooks/useAssets';
-import React from 'react';
-import { ActivityIndicator, SafeAreaView, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import { useUpdateTotalAssets } from '@/hooks/useUpdateTotalAssets';
+import { useState } from 'react';
+import { ActivityIndicator, Alert, SafeAreaView, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '@/constants/colors';
 import { CATEGORY_TYPES } from '@/constants/categories';
+import { formatNumber, parseNumber } from '@/utils/formatters';
+import { isEmptyString } from '@/utils/validators';
 
 export default function HomeScreen() {
+  const [isEditingTotalAssets, setIsEditingTotalAssets] = useState(false);
+  const [totalAssetsInput, setTotalAssetsInput] = useState('');
   const { data: assets = [], isLoading, error, refetch } = useAssets();
+  const { mutate: updateTotalAssets, isPending: isUpdateTotalAssetsPending } = useUpdateTotalAssets();
 
   if (isLoading) {
     return (
@@ -40,7 +46,38 @@ export default function HomeScreen() {
   const cashTotal = assets.
     filter(a => a.category === CATEGORY_TYPES.CASH)
     .reduce((sum, a) => sum + (a.currentBalance ?? 0), 0);
-  const lastMonthDiff = 0; // TODO: 전월 대비 자산 증감액 로직 구현 필요
+
+  const handleStartEditingTotalAssets = () => {
+    setTotalAssetsInput(formatNumber(totalAssets));
+    setIsEditingTotalAssets(true);
+  };
+
+  const handleCancelEditingTotalAssets = () => {
+    setTotalAssetsInput('');
+    setIsEditingTotalAssets(false);
+  };
+
+  const handleSubmitTotalAssets = () => {
+    if (isEmptyString(totalAssetsInput)) {
+      Alert.alert('안내', '총자산 값을 입력해주세요.');
+
+      return;
+    }
+
+    const targetTotalAssets = parseNumber(totalAssetsInput);
+
+    updateTotalAssets({
+      assets,
+      targetTotalAssets,
+    }, {
+      onSuccess: () => {
+        handleCancelEditingTotalAssets();
+      },
+      onError: () => {
+        Alert.alert('오류', '총자산 수정에 실패했습니다. 다시 시도해주세요.');
+      },
+    });
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
@@ -49,9 +86,15 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
         <TotalAssetsChart
           totalAssets={totalAssets}
-          lastMonthDiff={lastMonthDiff}
           investTotal={investTotal}
           cashTotal={cashTotal}
+          inputValue={totalAssetsInput}
+          isEditing={isEditingTotalAssets}
+          isPending={isUpdateTotalAssetsPending}
+          onCancel={handleCancelEditingTotalAssets}
+          onEditAmountChange={setTotalAssetsInput}
+          onStartEditing={handleStartEditingTotalAssets}
+          onSubmit={handleSubmitTotalAssets}
         />
         <SummaryCards investTotal={investTotal} cashTotal={cashTotal} />
         <PortfolioList assets={assets} />
