@@ -1,6 +1,9 @@
+import { useUpdateAssets } from '@/hooks/useUpdateAssets';
+import { parseNumber } from '@/utils/formatters';
+import { isEmptyString } from '@/utils/validators';
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '@/constants/colors';
 import { formatNumber } from '@/utils/formatters';
 import { Asset } from '@/types/domain/asset';
@@ -13,9 +16,118 @@ interface PortfolioListProps {
 const HEX_OPACITY_8_PERCENT = '15';
 
 export const PortfolioList = ({ assets }: PortfolioListProps) => {
+  const [editingAmounts, setEditingAmounts] = useState<Record<string, string>>({});
+  const [isEditing, setIsEditing] = useState(false);
+  const { mutateAsync: updateAssets, isPending } = useUpdateAssets();
+
+  const handleStartEdit = () => {
+    const nextEditingAmounts = assets.reduce<Record<string, string>>((amounts, asset) => {
+      return {
+        ...amounts,
+        [asset.id]: formatNumber(asset.currentBalance ?? 0),
+      };
+    }, {});
+
+    setEditingAmounts(nextEditingAmounts);
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingAmounts({});
+    setIsEditing(false);
+  };
+
+  const handleAmountChange = (assetId: string, value: string) => {
+    setEditingAmounts((prev) => {
+      return {
+        ...prev,
+        [assetId]: value,
+      };
+    });
+  };
+
+  const handleSubmitEdit = async () => {
+    const hasEmptyAmount = assets.some((asset) => {
+      return isEmptyString(editingAmounts[asset.id] ?? '');
+    });
+
+    if (hasEmptyAmount) {
+      Alert.alert('안내', '모든 자산 금액을 입력해주세요.');
+
+      return;
+    }
+
+    try {
+      await updateAssets({
+        items: assets.map((asset) => {
+          const nextBalance = parseNumber(editingAmounts[asset.id] ?? '');
+
+          return {
+            id: asset.id,
+            asset: {
+              currentBalance: nextBalance,
+            },
+          };
+        }),
+      });
+
+      handleCancelEdit();
+    } catch {
+      Alert.alert('오류', '자산 수정에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  const renderSectionAction = () => {
+    if (isEditing) {
+      return (
+        <View className="flex-row items-center">
+          <TouchableOpacity className="px-3 py-2 rounded-full bg-gray-200 mr-2" onPress={handleCancelEdit} disabled={isPending}>
+            <Text className="text-xs font-semibold text-gray-700">취소</Text>
+          </TouchableOpacity>
+          <TouchableOpacity className="px-3 py-2 rounded-full bg-primary-light" onPress={() => void handleSubmitEdit()} disabled={isPending}>
+            <Text className="text-xs font-semibold text-primary">{isPending ? '저장 중' : '저장'}</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    return (
+      <TouchableOpacity className="px-3 py-2 rounded-full bg-primary-light" onPress={handleStartEdit}>
+        <Text className="text-xs font-semibold text-primary">편집</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const getEditingAmount = (assetId: string): string => {
+    return editingAmounts[assetId] ?? '';
+  };
+
+  const renderAmountArea = (asset: Asset) => {
+    if (isEditing) {
+      return (
+        <TextInput
+          className="w-full h-[42px] text-base font-bold text-gray-900 text-right border border-gray-200 rounded-xl px-3 py-2"
+          keyboardType="numeric"
+          placeholder="0"
+          value={getEditingAmount(asset.id)}
+          onChangeText={(value) => handleAmountChange(asset.id, value)}
+        />
+      );
+    }
+
+    return (
+      <View className="w-full h-[42px] justify-center px-3 pt-1">
+        <Text className="text-base font-bold text-gray-900 text-right">{formatNumber(asset.currentBalance ?? 0)}</Text>
+      </View>
+    );
+  };
+
   return (
     <View className="mb-5">
-      <Text className="text-[17px] font-bold text-gray-900 mb-4">포트폴리오 상세</Text>
+      <View className="flex-row items-center justify-between mb-4">
+        <Text className="text-[17px] font-bold text-gray-900">포트폴리오 상세</Text>
+        {renderSectionAction()}
+      </View>
 
       {assets.map((item) => {
         const isInvest = item.category === CATEGORY_TYPES.INVEST;
@@ -25,7 +137,7 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
         return (
           <View
             key={item.id}
-            className="flex-row justify-between items-center p-4 bg-white rounded-2xl mb-3"
+            className="relative flex-row justify-between items-center p-4 bg-white rounded-2xl mb-3"
             style={{ shadowColor: '#000', shadowOpacity: 0.02, shadowOffset: { width: 0, height: 2 }, elevation: 2 }}
           >
             <View className="flex-row items-center">
@@ -46,7 +158,9 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
                 </View>
               </View>
             </View>
-            <Text className="text-base font-bold text-gray-900">{formatNumber(item.currentBalance ?? 0)}</Text>
+            <View className="w-[132px] items-end">
+              {renderAmountArea(item)}
+            </View>
           </View>
         );
       })}
