@@ -3,7 +3,7 @@ import { Asset } from '@/types/domain/asset';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface UpdateAssetsItem {
-  asset: Partial<Asset>;
+  currentBalance: number | null;
   id: string;
 }
 
@@ -12,9 +12,7 @@ interface UpdateAssetsParams {
 }
 
 const updateAssets = async ({ items }: UpdateAssetsParams): Promise<Asset[]> => {
-  return Promise.all(items.map(async (item) => {
-    return assetRepository.updateAsset(item.id, item.asset);
-  }));
+  return assetRepository.bulkUpdateAssets(items);
 };
 
 export const useUpdateAssets = () => {
@@ -22,7 +20,7 @@ export const useUpdateAssets = () => {
 
   return useMutation<Asset[], Error, UpdateAssetsParams>({
     mutationFn: updateAssets,
-    onSuccess: async (updatedAssets) => {
+    onSuccess: (updatedAssets) => {
       queryClient.setQueryData<Asset[]>(['assets'], (prev) => {
         if (!prev) {
           return updatedAssets;
@@ -36,9 +34,6 @@ export const useUpdateAssets = () => {
           return updatedAssetMap.get(asset.id) ?? asset;
         });
       });
-
-      await queryClient.invalidateQueries({ queryKey: ['assets'] });
     },
   });
 };
-

@@ -24,7 +24,7 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
     const nextEditingAmounts = assets.reduce<Record<string, string>>((amounts, asset) => {
       return {
         ...amounts,
-        [asset.id]: formatNumber(asset.currentBalance ?? 0),
+        [asset.id]: asset.currentBalance === null ? '' : formatNumber(asset.currentBalance),
       };
     }, {});
 
@@ -47,28 +47,42 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
   };
 
   const handleSubmitEdit = async () => {
-    const hasEmptyAmount = assets.some((asset) => {
-      return isEmptyString(editingAmounts[asset.id] ?? '');
+    const hasInvalidEmptyAmount = assets.some((asset) => {
+      return isEmptyString(editingAmounts[asset.id] ?? '') && asset.currentBalance !== null;
     });
 
-    if (hasEmptyAmount) {
-      Alert.alert('안내', '모든 자산 금액을 입력해주세요.');
+    if (hasInvalidEmptyAmount) {
+      Alert.alert('안내', '기존 금액이 있는 자산은 빈 값으로 저장할 수 없습니다.');
+
+      return;
+    }
+
+    const items = assets.reduce<Array<{ id: string; currentBalance: number | null }>>((nextItems, asset) => {
+      const editingValue = editingAmounts[asset.id] ?? '';
+      const nextBalance = isEmptyString(editingValue) ? null : parseNumber(editingValue);
+
+      if (asset.currentBalance === nextBalance) {
+        return nextItems;
+      }
+
+      return [
+        ...nextItems,
+        {
+          id: asset.id,
+          currentBalance: nextBalance,
+        },
+      ];
+    }, []);
+
+    if (items.length === 0) {
+      handleCancelEdit();
 
       return;
     }
 
     try {
       await updateAssets({
-        items: assets.map((asset) => {
-          const nextBalance = parseNumber(editingAmounts[asset.id] ?? '');
-
-          return {
-            id: asset.id,
-            asset: {
-              currentBalance: nextBalance,
-            },
-          };
-        }),
+        items,
       });
 
       handleCancelEdit();
