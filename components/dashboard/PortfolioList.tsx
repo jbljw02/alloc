@@ -1,6 +1,6 @@
 import { useUpdateAssets } from '@/hooks/useUpdateAssets';
 import { parseNumber } from '@/utils/formatters';
-import { isEmptyString } from '@/utils/validators';
+import { isEmptyString, isNil } from '@/utils/validators';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -24,7 +24,7 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
     const nextEditingAmounts = assets.reduce<Record<string, string>>((amounts, asset) => {
       return {
         ...amounts,
-        [asset.id]: asset.currentBalance === null ? '' : formatNumber(asset.currentBalance),
+        [asset.id]: isNil(asset.currentBalance) ? '' : formatNumber(asset.currentBalance),
       };
     }, {});
 
