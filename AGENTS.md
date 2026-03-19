@@ -22,6 +22,7 @@ This file defines the instructions and standards that AI agents must follow in t
 - **Nullish Coalescing**: Use `??` (Nullish Coalescing) by default for default value assignments.
 
 ### 3. Functional Programming
+- **Single Responsibility**: A function must perform only one role and have a single responsibility.
 - Immutability: Do not reassign variables.
 - Strictly use `const`, avoid `let`.
 - Extract utility logic into separate functions.
@@ -42,6 +43,7 @@ This file defines the instructions and standards that AI agents must follow in t
 ## Pull Request Rules
 
 - **PR Template Required**: Before creating or updating a Pull Request, open `.github/PULL_REQUEST_TEMPLATE.md` and follow its structure exactly. Do not use an arbitrary title or description format when a repository template exists.
+- **PR Title Convention Required**: Pull Request titles must follow the Conventional Commits format: `<type>(<scope>): <description>`.
 
 ## Documentation Rules
 
