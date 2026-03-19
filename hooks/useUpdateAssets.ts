@@ -34,6 +34,8 @@ export const useUpdateAssets = () => {
           return updatedAssetMap.get(asset.id) ?? asset;
         });
       });
+
+      void queryClient.invalidateQueries({ queryKey: ['assets'] });
     },
   });
 };
