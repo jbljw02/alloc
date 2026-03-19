@@ -88,7 +88,12 @@ export const assetRepository = {
     }
 
     const { data, error } = await supabase.rpc('bulk_update_assets', {
-      updates,
+      updates: updates.map((update) => {
+        return {
+          id: update.id,
+          current_balance: update.currentBalance,
+        };
+      }),
     });
 
     if (error) {
