@@ -2,7 +2,6 @@ import { PortfolioList } from '@/components/dashboard/PortfolioList';
 import { SummaryCards } from '@/components/dashboard/SummaryCards';
 import { TotalAssetsChart } from '@/components/dashboard/TotalAssetsChart';
 import { useAssets } from '@/hooks/useAssets';
-import React from 'react';
 import { ActivityIndicator, SafeAreaView, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '@/constants/colors';
 import { CATEGORY_TYPES } from '@/constants/categories';
@@ -40,7 +39,6 @@ export default function HomeScreen() {
   const cashTotal = assets.
     filter(a => a.category === CATEGORY_TYPES.CASH)
     .reduce((sum, a) => sum + (a.currentBalance ?? 0), 0);
-  const lastMonthDiff = 0; // TODO: 전월 대비 자산 증감액 로직 구현 필요
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
@@ -49,11 +47,13 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
         <TotalAssetsChart
           totalAssets={totalAssets}
-          lastMonthDiff={lastMonthDiff}
           investTotal={investTotal}
           cashTotal={cashTotal}
         />
-        <SummaryCards investTotal={investTotal} cashTotal={cashTotal} />
+        <SummaryCards
+          investTotal={investTotal}
+          cashTotal={cashTotal}
+        />
         <PortfolioList assets={assets} />
         <View className="h-[60px]" />
       </ScrollView>
