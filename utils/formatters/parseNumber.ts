@@ -1,4 +1,5 @@
 import { isNil } from '@/utils/validators';
+import { sanitizeNumericInput } from './sanitizeNumericInput';
 
 export const parseNumber = (value: string | number): number => {
   if (isNil(value)) {
@@ -9,6 +10,6 @@ export const parseNumber = (value: string | number): number => {
     return Number.isNaN(value) ? 0 : value;
   }
 
-  const cleanNum = value.replace(/[^0-9]/g, '');
+  const cleanNum = sanitizeNumericInput(value);
   return cleanNum ? parseInt(cleanNum, 10) : 0;
 };

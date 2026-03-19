@@ -1,5 +1,5 @@
 import { useUpdateAssets } from '@/hooks/useUpdateAssets';
-import { parseNumber } from '@/utils/formatters';
+import { parseNumber, sanitizeNumericInput } from '@/utils/formatters';
 import { isEmptyString, isNil } from '@/utils/validators';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
@@ -38,10 +38,12 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
   };
 
   const handleAmountChange = (assetId: string, value: string) => {
+    const normalizedValue = sanitizeNumericInput(value);
+
     setEditingAmounts((prev) => {
       return {
         ...prev,
-        [assetId]: value,
+        [assetId]: normalizedValue,
       };
     });
   };
