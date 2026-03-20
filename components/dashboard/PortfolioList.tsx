@@ -1,11 +1,10 @@
 import { useUpdateAssets } from '@/hooks/useUpdateAssets';
-import { parseNumber, sanitizeNumericInput } from '@/utils/formatters';
+import { formatNumber } from '@/utils/formatters';
 import { isEmptyString, isNil } from '@/utils/validators';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '@/constants/colors';
-import { formatNumber } from '@/utils/formatters';
 import { Asset } from '@/types/domain/asset';
 import { CATEGORY_TYPES } from '@/constants/categories';
 
@@ -38,7 +37,7 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
   };
 
   const handleAmountChange = (assetId: string, value: string) => {
-    const normalizedValue = sanitizeNumericInput(value);
+    const normalizedValue = formatNumber(value);
 
     setEditingAmounts((prev) => {
       return {
@@ -59,28 +58,12 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
       return;
     }
 
-    const items = assets.reduce<Array<{ id: string; currentBalance: number | null }>>((nextItems, asset) => {
-      const editingValue = editingAmounts[asset.id] ?? '';
-      const nextBalance = isEmptyString(editingValue) ? null : parseNumber(editingValue);
-
-      if (asset.currentBalance === nextBalance) {
-        return nextItems;
-      }
-
-      return [
-        ...nextItems,
-        {
-          id: asset.id,
-          currentBalance: nextBalance,
-        },
-      ];
-    }, []);
-
-    if (items.length === 0) {
-      handleCancelEdit();
-
-      return;
-    }
+    const items = assets.map((asset) => {
+      return {
+        asset,
+        editingAmount: editingAmounts[asset.id] ?? '',
+      };
+    });
 
     try {
       await updateAssets({
