@@ -14,6 +14,10 @@ interface PortfolioListProps {
 
 const HEX_OPACITY_8_PERCENT = '15';
 
+const sanitizeEditingAmount = (value: string): string => {
+  return value.replace(/[^0-9,\s-]/g, '');
+};
+
 export const PortfolioList = ({ assets }: PortfolioListProps) => {
   const [editingAmounts, setEditingAmounts] = useState<Record<string, string>>({});
   const [isEditing, setIsEditing] = useState(false);
@@ -37,7 +41,7 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
   };
 
   const handleAmountChange = (assetId: string, value: string) => {
-    const normalizedValue = formatNumber(value);
+    const normalizedValue = sanitizeEditingAmount(value);
 
     setEditingAmounts((prev) => {
       return {
