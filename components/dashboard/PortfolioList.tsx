@@ -1,11 +1,10 @@
 import { useUpdateAssets } from '@/hooks/useUpdateAssets';
-import { parseNumber, sanitizeNumericInput } from '@/utils/formatters';
-import { isEmptyString, isNil } from '@/utils/validators';
+import { formatNumber } from '@/utils/formatters';
+import { isNil } from '@/utils/validators';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '@/constants/colors';
-import { formatNumber } from '@/utils/formatters';
 import { Asset } from '@/types/domain/asset';
 import { CATEGORY_TYPES } from '@/constants/categories';
 
@@ -14,6 +13,10 @@ interface PortfolioListProps {
 }
 
 const HEX_OPACITY_8_PERCENT = '15';
+
+const sanitizeEditingAmount = (value: string): string => {
+  return value.replace(/[^0-9,\s-]/g, '');
+};
 
 export const PortfolioList = ({ assets }: PortfolioListProps) => {
   const [editingAmounts, setEditingAmounts] = useState<Record<string, string>>({});
@@ -38,7 +41,7 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
   };
 
   const handleAmountChange = (assetId: string, value: string) => {
-    const normalizedValue = sanitizeNumericInput(value);
+    const normalizedValue = sanitizeEditingAmount(value);
 
     setEditingAmounts((prev) => {
       return {
@@ -49,38 +52,12 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
   };
 
   const handleSubmitEdit = async () => {
-    const hasInvalidEmptyAmount = assets.some((asset) => {
-      return isEmptyString(editingAmounts[asset.id] ?? '') && asset.currentBalance !== null;
+    const items = assets.map((asset) => {
+      return {
+        asset,
+        editingAmount: editingAmounts[asset.id] ?? '',
+      };
     });
-
-    if (hasInvalidEmptyAmount) {
-      Alert.alert('안내', '기존 금액이 있는 자산은 빈 값으로 저장할 수 없습니다.');
-
-      return;
-    }
-
-    const items = assets.reduce<Array<{ id: string; currentBalance: number | null }>>((nextItems, asset) => {
-      const editingValue = editingAmounts[asset.id] ?? '';
-      const nextBalance = isEmptyString(editingValue) ? null : parseNumber(editingValue);
-
-      if (asset.currentBalance === nextBalance) {
-        return nextItems;
-      }
-
-      return [
-        ...nextItems,
-        {
-          id: asset.id,
-          currentBalance: nextBalance,
-        },
-      ];
-    }, []);
-
-    if (items.length === 0) {
-      handleCancelEdit();
-
-      return;
-    }
 
     try {
       await updateAssets({

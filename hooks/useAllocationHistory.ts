@@ -44,12 +44,12 @@ export const useAllocationHistory = ({ allocations, assets }: UseAllocationHisto
     ? getCategoryTotals(
       (editingItems ?? []).map((item) => ({
         ...item,
-        amount: parseNumber(item.amount),
+        amount: parseNumber(item.amount) ?? 0,
       })),
     )
     : getCategoryTotals(historyItems);
   const totalAmount = isEditing
-    ? getTotalAmount((editingItems ?? []).map((item) => ({ amount: parseNumber(item.amount) })))
+    ? getTotalAmount((editingItems ?? []).map((item) => ({ amount: parseNumber(item.amount) ?? 0 })))
     : getTotalAmount(historyItems);
   const previousMonthTotalAmount = getPreviousMonthTotalAmount(previousMonthAllocations);
   const monthDiff = totalAmount - previousMonthTotalAmount;

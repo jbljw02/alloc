@@ -4,6 +4,7 @@ import { allocationRepository } from '@/repositories/allocation.repository';
 import { assetRepository } from '@/repositories/asset.repository';
 import { Allocation } from '@/types/domain/allocation';
 import { formatDate, parseNumber } from '@/utils/formatters';
+import { AppError, ERROR_CODES } from '@/utils/errors';
 
 export interface SaveAllocationItem {
   id: string;
@@ -70,6 +71,10 @@ const toBalanceUpdates = (updates: Map<string, number>): BalanceUpdate[] => {
 const parseValidItems = (items: SaveAllocationItem[]): ParsedSaveAllocationItem[] => {
   return items.reduce<ParsedSaveAllocationItem[]>((validItems, item) => {
     const inputAmount = parseNumber(item.amount);
+
+    if (inputAmount === null) {
+      throw new AppError('유효하지 않은 배분 금액이 있습니다.', ERROR_CODES.VALIDATION_ERROR);
+    }
 
     if (inputAmount <= 0) {
       return validItems;

@@ -149,4 +149,20 @@ describe('saveAllocations', () => {
       },
     ]);
   });
+
+  it('음수 문자열 금액이 들어오면 에러를 던진다', async () => {
+    await expect(saveAllocations({
+      allocationMonth: '2026-03',
+      existingAllocations: [],
+      items: [
+        {
+          amount: '-250',
+          assetId: 'asset-1',
+          category: CATEGORY_TYPES.CASH,
+          id: 'new-allocation',
+          name: '입출금',
+        },
+      ],
+    })).rejects.toThrow('유효하지 않은 배분 금액이 있습니다.');
+  });
 });
