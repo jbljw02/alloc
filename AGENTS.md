@@ -16,7 +16,7 @@ This file defines the instructions and standards that AI agents must follow in t
   - **Bad**: `const formatDate = (param) => new Date(param);`
   - **Good**: `const formatDate = (param) => { return new Date(param); };`
 - **Explicit Boolean Values**: Use explicit boolean values in conditions.
-- **Null Checks & Validations**: Always use `@/utils/validators.ts` when applicable (e.g., `isNil`, `isNotEmptyArray`, `isEmptyString`). Avoid raw `length === 0` or `== null` checks if a validator exists.
+- **Null Checks & Validations**: Use `@/utils/validators.ts` for null/undefined checks, string emptiness checks, and array emptiness checks whenever a validator exists. Prefer `isNil`, `isNotNil`, `isEmptyString`, `isNotEmptyString`, `isEmptyArray`, and `isNotEmptyArray` over raw `== null`, `!= null`, `=== ''`, `!== ''`, `length === 0`, and `length > 0`.
 - **Strict Equality**: Use strict equality `===` for all other comparisons.
 - **Prefer Early Returns**: Use early returns over `else` blocks to reduce nesting.
 - **Nullish Coalescing**: Use `??` (Nullish Coalescing) by default for default value assignments.
