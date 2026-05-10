@@ -1,6 +1,6 @@
 import { useUpdateAssets } from '@/hooks/useUpdateAssets';
 import { formatNumber } from '@/utils/formatters';
-import { isEmptyString, isNil } from '@/utils/validators';
+import { isNil } from '@/utils/validators';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -52,16 +52,6 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
   };
 
   const handleSubmitEdit = async () => {
-    const hasInvalidEmptyAmount = assets.some((asset) => {
-      return isEmptyString(editingAmounts[asset.id] ?? '') && asset.currentBalance !== null;
-    });
-
-    if (hasInvalidEmptyAmount) {
-      Alert.alert('안내', '기존 금액이 있는 자산은 빈 값으로 저장할 수 없습니다.');
-
-      return;
-    }
-
     const items = assets.map((asset) => {
       return {
         asset,
