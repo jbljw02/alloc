@@ -175,9 +175,6 @@ export default function AllocationHistoryScreen() {
               </TouchableOpacity>
             )}
           </View>
-          {editor.isEditing ? (
-            <Text className="text-xs text-gray-500 mt-2">금액 수정, 항목 삭제, 자산 추가까지 먼저 구성했습니다.</Text>
-          ) : null}
         </View>
 
         <HistoryItemList

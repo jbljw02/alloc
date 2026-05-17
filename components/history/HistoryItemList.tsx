@@ -2,10 +2,27 @@ import { CATEGORY_CONFIG, CATEGORY_TYPES, CategoryType } from '@/constants/categ
 import { AllocationHistoryEditorItem, AllocationHistoryFilter, AllocationHistoryItem } from '@/hooks/history/allocationHistory';
 import { formatAmount } from '@/utils/formatters';
 import { Ionicons } from '@expo/vector-icons';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '@/constants/colors';
 
 const HEX_OPACITY_8_PERCENT = '15';
+
+const styles = StyleSheet.create({
+  amountInput: {
+    backgroundColor: 'transparent',
+    includeFontPadding: false,
+    paddingBottom: 8,
+    paddingRight: 1,
+    paddingTop: 0,
+    textAlign: 'right',
+    textAlignVertical: 'center',
+  },
+  amountUnit: {
+    includeFontPadding: false,
+    lineHeight: 22,
+  },
+});
+
 type HistoryListItem = AllocationHistoryItem | AllocationHistoryEditorItem;
 
 interface HistoryItemListProps {
@@ -48,10 +65,10 @@ const getItemIconName = (item: HistoryListItem): keyof typeof Ionicons.glyphMap 
 
 const getAmountLabel = (amount: string | number): string => {
   if (typeof amount === 'number') {
-    return `${formatAmount(amount)}원`;
+    return formatAmount(amount);
   }
 
-  return amount === '' ? '' : `${amount}원`;
+  return amount;
 };
 
 export const HistoryItemList = ({
@@ -91,6 +108,8 @@ export const HistoryItemList = ({
         const categoryConfig = CATEGORY_CONFIG[item.category];
         const itemColor = getItemColor(item);
         const itemIconName = getItemIconName(item);
+        const editingAmount = typeof item.amount === 'string' ? item.amount : '';
+        const amountValue = isEditing ? editingAmount : getAmountLabel(item.amount);
 
         return (
           <View
@@ -120,17 +139,25 @@ export const HistoryItemList = ({
                 <Text className="text-xs text-gray-400">{selectedMonthLabel} 배분액</Text>
               </View>
             </View>
-            {isEditing && onAmountChange ? (
-              <TextInput
-                className="text-base font-bold text-gray-900 min-w-[88px] text-right p-0"
-                keyboardType="numeric"
-                placeholder="0"
-                value={typeof item.amount === 'string' ? item.amount : ''}
-                onChangeText={(text) => onAmountChange(text, item.id)}
-              />
-            ) : (
-              <Text className="text-base font-bold text-gray-900">{getAmountLabel(item.amount)}</Text>
-            )}
+            <View className="min-w-[88px] h-[44px] flex-row items-center justify-end">
+              <View className="w-[88px] h-full justify-center">
+                <TextInput
+                  className={`w-full text-base font-bold text-right p-0 m-0 ${isEditing ? 'text-gray-400' : 'text-gray-900'}`}
+                  style={styles.amountInput}
+                  cursorColor={COLORS.primary}
+                  editable={isEditing}
+                  keyboardType="numeric"
+                  readOnly={!isEditing}
+                  selectionColor={COLORS.primary}
+                  underlineColorAndroid="transparent"
+                  value={amountValue}
+                  onChangeText={(text) => onAmountChange?.(text, item.id)}
+                />
+              </View>
+              <Text className="text-base font-bold text-gray-900" style={styles.amountUnit}>
+                원
+              </Text>
+            </View>
           </View>
         );
       })}
