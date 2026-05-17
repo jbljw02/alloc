@@ -32,7 +32,6 @@ export default function AllocationHistoryScreen() {
     }, {
       onSuccess: () => {
         editor.handleCancelEditing();
-        Alert.alert('성공', '변경사항이 저장되었습니다.');
       },
       onError: () => {
         Alert.alert('오류', '저장에 실패했습니다. 다시 시도해주세요.');
