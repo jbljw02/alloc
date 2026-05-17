@@ -11,7 +11,7 @@ import { isEmptyArray } from '@/utils/validators';
 import { getAllocationMonthValue } from '@/services/allocation/allocation.service';
 
 export default function AllocationScreen() {
-  const [income, setIncome] = useState('');
+  const [income, setIncome] = useState('0');
   const [items, setItems] = useState<AllocationItem[]>([]);
   const [isModalVisible, setModalVisible] = useState(false);
 
