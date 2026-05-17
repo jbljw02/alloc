@@ -10,5 +10,6 @@ export declare const COLORS: {
   readonly increase: string;
   readonly decrease: string;
   readonly warning: string;
+  readonly warningDark: string;
   readonly warningLight: string;
 };

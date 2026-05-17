@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '@/constants/colors';
 import { Asset } from '@/types/domain/asset';
-import { CATEGORY_TYPES } from '@/constants/categories';
+import { CATEGORY_CONFIG, CATEGORY_TYPES } from '@/constants/categories';
 
 interface PortfolioListProps {
   assets: Asset[];
@@ -143,6 +143,7 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
 
       {assets.map((item) => {
         const isInvest = item.category === CATEGORY_TYPES.INVEST;
+        const categoryConfig = CATEGORY_CONFIG[item.category];
         const iconColor = item.color ?? COLORS.primary;
         const iconName = item.iconName ?? 'wallet';
 
@@ -162,10 +163,8 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
               <View>
                 <View className="flex-row items-center mb-1">
                   <Text className="text-[15px] font-semibold text-gray-800 mr-2">{item.name}</Text>
-                  <View className={`px-1.5 py-0.5 rounded-md ${isInvest ? 'bg-primary-light' : 'bg-emerald-light'}`}>
-                    <Text className={`text-[10px] font-bold ${isInvest ? 'text-primary' : 'text-emerald'}`}>
-                      {item.category}
-                    </Text>
+                  <View className={`px-1.5 py-0.5 rounded-md ${categoryConfig.bgClass}`}>
+                    <Text className={`text-[10px] font-bold ${categoryConfig.textClass}`}>{categoryConfig.label}</Text>
                   </View>
                 </View>
               </View>
