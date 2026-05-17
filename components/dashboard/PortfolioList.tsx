@@ -3,10 +3,10 @@ import { formatNumber } from '@/utils/formatters';
 import { isNil } from '@/utils/validators';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '@/constants/colors';
 import { Asset } from '@/types/domain/asset';
-import { CATEGORY_TYPES } from '@/constants/categories';
+import { CATEGORY_CONFIG, CATEGORY_TYPES } from '@/constants/categories';
 
 interface PortfolioListProps {
   assets: Asset[];
@@ -14,9 +14,21 @@ interface PortfolioListProps {
 
 const HEX_OPACITY_8_PERCENT = '15';
 
-const sanitizeEditingAmount = (value: string): string => {
-  return value.replace(/[^0-9,\s-]/g, '');
-};
+const styles = StyleSheet.create({
+  amountInput: {
+    backgroundColor: 'transparent',
+    includeFontPadding: false,
+    paddingBottom: 8,
+    paddingRight: 1,
+    paddingTop: 0,
+    textAlign: 'right',
+    textAlignVertical: 'center',
+  },
+  amountUnit: {
+    includeFontPadding: false,
+    lineHeight: 22,
+  },
+});
 
 export const PortfolioList = ({ assets }: PortfolioListProps) => {
   const [editingAmounts, setEditingAmounts] = useState<Record<string, string>>({});
@@ -41,12 +53,12 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
   };
 
   const handleAmountChange = (assetId: string, value: string) => {
-    const normalizedValue = sanitizeEditingAmount(value);
+    const formattedValue = formatNumber(value);
 
     setEditingAmounts((prev) => {
       return {
         ...prev,
-        [assetId]: normalizedValue,
+        [assetId]: formattedValue,
       };
     });
   };
@@ -96,21 +108,28 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
   };
 
   const renderAmountArea = (asset: Asset) => {
-    if (isEditing) {
-      return (
-        <TextInput
-          className="w-full h-[42px] text-base font-bold text-gray-900 text-right border border-gray-200 rounded-xl px-3 py-2"
-          keyboardType="numeric"
-          placeholder="0"
-          value={getEditingAmount(asset.id)}
-          onChangeText={(value) => handleAmountChange(asset.id, value)}
-        />
-      );
-    }
+    const editingAmount = getEditingAmount(asset.id);
+    const amountValue = isEditing ? editingAmount : formatNumber(asset.currentBalance ?? 0);
 
     return (
-      <View className="w-full h-[42px] justify-center px-3 pt-1">
-        <Text className="text-base font-bold text-gray-900 text-right">{formatNumber(asset.currentBalance ?? 0)}</Text>
+      <View className="w-full h-[42px] flex-row items-center justify-end">
+        <View className="w-[112px] h-full justify-center pl-2 pr-0">
+          <TextInput
+            className={`w-full text-base font-bold text-right p-0 m-0 ${isEditing ? 'text-gray-400' : 'text-gray-900'}`}
+            style={styles.amountInput}
+            cursorColor={COLORS.primary}
+            editable={isEditing}
+            keyboardType="numeric"
+            readOnly={!isEditing}
+            selectionColor={COLORS.primary}
+            underlineColorAndroid="transparent"
+            value={amountValue}
+            onChangeText={(value) => handleAmountChange(asset.id, value)}
+          />
+        </View>
+        <Text className="text-base font-bold text-gray-900 ml-0.5" style={styles.amountUnit}>
+          원
+        </Text>
       </View>
     );
   };
@@ -124,6 +143,7 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
 
       {assets.map((item) => {
         const isInvest = item.category === CATEGORY_TYPES.INVEST;
+        const categoryConfig = CATEGORY_CONFIG[item.category];
         const iconColor = item.color ?? COLORS.primary;
         const iconName = item.iconName ?? 'wallet';
 
@@ -143,10 +163,8 @@ export const PortfolioList = ({ assets }: PortfolioListProps) => {
               <View>
                 <View className="flex-row items-center mb-1">
                   <Text className="text-[15px] font-semibold text-gray-800 mr-2">{item.name}</Text>
-                  <View className={`px-1.5 py-0.5 rounded-md ${isInvest ? 'bg-primary-light' : 'bg-emerald-light'}`}>
-                    <Text className={`text-[10px] font-bold ${isInvest ? 'text-primary' : 'text-emerald'}`}>
-                      {item.category}
-                    </Text>
+                  <View className={`px-1.5 py-0.5 rounded-md ${categoryConfig.bgClass}`}>
+                    <Text className={`text-[10px] font-bold ${categoryConfig.textClass}`}>{categoryConfig.label}</Text>
                   </View>
                 </View>
               </View>

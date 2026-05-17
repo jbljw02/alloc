@@ -22,6 +22,7 @@ export const AllocationFooter = ({
   const remainingColor = isOverBudget ? 'text-danger' : 'text-gray-900';
   const buttonBg = isComplete ? 'bg-gray-900' : 'bg-gray-200';
   const buttonTextColor = isComplete ? 'text-white' : 'text-gray-400';
+  const displayRemaining = Number.isNaN(remaining) ? 0 : remaining;
 
   const buttonText = isLoading ?
     "저장 중..." :
@@ -37,7 +38,7 @@ export const AllocationFooter = ({
       <View className="flex-row justify-between mb-3">
         <Text className="text-[15px] text-gray-500">남은 금액</Text>
         <Text className={`text-lg font-bold ${remainingColor}`}>
-          {remaining.toLocaleString()} 원
+          {displayRemaining.toLocaleString()} 원
         </Text>
       </View>
 

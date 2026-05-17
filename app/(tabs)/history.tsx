@@ -32,7 +32,6 @@ export default function AllocationHistoryScreen() {
     }, {
       onSuccess: () => {
         editor.handleCancelEditing();
-        Alert.alert('성공', '변경사항이 저장되었습니다.');
       },
       onError: () => {
         Alert.alert('오류', '저장에 실패했습니다. 다시 시도해주세요.');
@@ -175,9 +174,6 @@ export default function AllocationHistoryScreen() {
               </TouchableOpacity>
             )}
           </View>
-          {editor.isEditing ? (
-            <Text className="text-xs text-gray-500 mt-2">금액 수정, 항목 삭제, 자산 추가까지 먼저 구성했습니다.</Text>
-          ) : null}
         </View>
 
         <HistoryItemList

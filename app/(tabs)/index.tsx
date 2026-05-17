@@ -32,11 +32,12 @@ export default function HomeScreen() {
     );
   }
 
-  const totalAssets = assets.reduce((sum, a) => sum + (a.currentBalance ?? 0), 0);
-  const investTotal = assets.
+  const portfolioAssets = assets.filter((asset) => asset.category !== CATEGORY_TYPES.SPEND);
+  const totalAssets = portfolioAssets.reduce((sum, a) => sum + (a.currentBalance ?? 0), 0);
+  const investTotal = portfolioAssets.
     filter(a => a.category === CATEGORY_TYPES.INVEST)
     .reduce((sum, a) => sum + (a.currentBalance ?? 0), 0);
-  const cashTotal = assets.
+  const cashTotal = portfolioAssets.
     filter(a => a.category === CATEGORY_TYPES.CASH)
     .reduce((sum, a) => sum + (a.currentBalance ?? 0), 0);
 
@@ -54,7 +55,7 @@ export default function HomeScreen() {
           investTotal={investTotal}
           cashTotal={cashTotal}
         />
-        <PortfolioList assets={assets} />
+        <PortfolioList assets={portfolioAssets} />
         <View className="h-[60px]" />
       </ScrollView>
     </SafeAreaView>
