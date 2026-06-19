@@ -1,6 +1,8 @@
 import { assetRepository } from '@/repositories/asset.repository';
+import { useAuthUserId } from '@/hooks/useAuthUserId';
 import { buildAssetBalanceUpdates } from '@/services/asset/asset.service';
 import { Asset } from '@/types/domain/asset';
+import { isNil } from '@/utils/validators';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface UpdateAssetsItem {
@@ -34,15 +36,22 @@ const updateAssets = async ({ items }: UpdateAssetsParams): Promise<Asset[]> => 
 
 export const useUpdateAssets = () => {
   const queryClient = useQueryClient();
+  const { data: userId } = useAuthUserId();
 
   return useMutation<Asset[], Error, UpdateAssetsParams>({
     mutationFn: updateAssets,
     onSuccess: (updatedAssets) => {
+      if (isNil(userId)) {
+        return;
+      }
+
       if (updatedAssets.length === 0) {
         return;
       }
 
-      queryClient.setQueryData<Asset[]>(['assets'], (prev) => {
+      const assetsQueryKey = ['assets', userId];
+
+      queryClient.setQueryData<Asset[]>(assetsQueryKey, (prev) => {
         if (!prev) {
           return updatedAssets;
         }
@@ -56,7 +65,7 @@ export const useUpdateAssets = () => {
         });
       });
 
-      void queryClient.invalidateQueries({ queryKey: ['assets'] });
+      void queryClient.invalidateQueries({ queryKey: assetsQueryKey });
     },
   });
 };

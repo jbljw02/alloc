@@ -17,9 +17,6 @@ export const toAllocationRow = (dto: Partial<Allocation>): Partial<AllocationRow
   if (isNotNil(dto.id)) {
     row.id = dto.id;
   }
-  if (isNotNil(dto.userId)) {
-    row.user_id = dto.userId;
-  }
   if (isNotNil(dto.assetId)) {
     row.asset_id = dto.assetId;
   }
