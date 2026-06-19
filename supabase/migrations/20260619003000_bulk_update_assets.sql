@@ -9,6 +9,10 @@ declare
   update_id uuid;
   next_balance numeric;
 begin
+  if auth.uid() is null then
+    raise exception 'authenticated user is required';
+  end if;
+
   if jsonb_typeof(updates) <> 'array' then
     raise exception 'updates must be a json array';
   end if;
@@ -37,7 +41,8 @@ begin
     set
       current_balance = next_balance,
       updated_at = now()
-    where id = update_id;
+    where id = update_id
+      and user_id = auth.uid();
 
     if not found then
       raise exception 'asset not found: %', update_id;
@@ -45,13 +50,13 @@ begin
   end loop;
 
   return query
-  select assets.*
-  from public.assets
+  select a.*
+  from public.assets as a
   join (
     select (value ->> 'id')::uuid as id
     from jsonb_array_elements(updates)
   ) as updated_ids
-    on updated_ids.id = assets.id;
+    on updated_ids.id = a.id
+  where a.user_id = auth.uid();
 end;
 $$;
-

@@ -1,8 +1,5 @@
 begin;
 
-delete from public.allocations;
-delete from public.assets;
-
 alter table public.assets
   add column if not exists user_id uuid;
 
