@@ -8,9 +8,10 @@ import { CategoryType } from '@/constants/categories';
 import { formatNumber } from '@/utils/formatters';
 import { useSaveAllocation } from '@/hooks/useSaveAllocation';
 import { isEmptyArray } from '@/utils/validators';
+import { getAllocationMonthValue } from '@/services/allocation/allocation.service';
 
 export default function AllocationScreen() {
-  const [income, setIncome] = useState('');
+  const [income, setIncome] = useState('0');
   const [items, setItems] = useState<AllocationItem[]>([]);
   const [isModalVisible, setModalVisible] = useState(false);
 
@@ -50,7 +51,11 @@ export default function AllocationScreen() {
       return;
     }
 
-    saveAllocation(items, {
+    saveAllocation({
+      allocationMonth: getAllocationMonthValue(new Date()),
+      existingAllocations: [],
+      items,
+    }, {
       onSuccess: () => {
         Alert.alert('성공', '변경사항이 저장되었습니다.', [
           {

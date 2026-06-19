@@ -22,6 +22,7 @@ const COLORS = {
 
   // 소비(앰버) - 카테고리용
   warning: '#F59E0B',
+  warningDark: '#D97706',
   warningLight: '#FFFBEB',
 };
 

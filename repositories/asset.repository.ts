@@ -82,6 +82,31 @@ export const assetRepository = {
     return toAssetDTO(data);
   },
 
+  async bulkUpdateAssets(updates: Array<{ id: string; currentBalance: number | null }>): Promise<Asset[]> {
+    if (updates.length === 0) {
+      return [];
+    }
+
+    const { data, error } = await supabase.rpc('bulk_update_assets', {
+      updates: updates.map((update) => {
+        return {
+          id: update.id,
+          current_balance: update.currentBalance,
+        };
+      }),
+    });
+
+    if (error) {
+      throw new AppError(`자산 일괄 업데이트에 실패했습니다: ${error.message}`, ERROR_CODES.VALIDATION_ERROR, error);
+    }
+
+    if (isNil(data)) {
+      throw new AppError('자산 일괄 업데이트 후 데이터를 가져오지 못했습니다.', ERROR_CODES.UNKNOWN_ERROR);
+    }
+
+    return data.map(toAssetDTO);
+  },
+
   async bulkUpdateBalance(updates: { id: string; amount: number }[]): Promise<void> {
     if (updates.length === 0) {
       return;

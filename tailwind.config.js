@@ -5,6 +5,7 @@ module.exports = {
   content: [
     "./app/**/*.{js,jsx,ts,tsx}",
     "./components/**/*.{js,jsx,ts,tsx}",
+    "./constants/**/*.{js,ts}",
   ],
   presets: [require("nativewind/preset")],
   theme: {
@@ -37,6 +38,7 @@ module.exports = {
         },
         warning: {
           DEFAULT: COLORS.warning,
+          dark: COLORS.warningDark,
           light: COLORS.warningLight,
         },
       },
