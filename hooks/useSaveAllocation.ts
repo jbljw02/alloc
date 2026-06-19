@@ -1,14 +1,30 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { saveAllocations } from '@/services/allocation/allocation.service';
+import { useAuthUserId } from '@/hooks/useAuthUserId';
+import { saveAllocations, SaveAllocationItem } from '@/services/allocation/allocation.service';
+import { Allocation } from '@/types/domain/allocation';
+import { isNil } from '@/utils/validators';
+
+interface SaveAllocationMutationParams {
+  allocationMonth: string;
+  existingAllocations: Allocation[];
+  items: SaveAllocationItem[];
+}
 
 export const useSaveAllocation = () => {
   const queryClient = useQueryClient();
+  const { data: userId } = useAuthUserId();
 
-  return useMutation({
+  return useMutation<void, Error, SaveAllocationMutationParams>({
     mutationFn: saveAllocations,
     onSuccess: () => {
-      // 대시보드 및 자산 목록 관련 쿼리 무효화(자동 갱신 유도)
-      queryClient.invalidateQueries({ queryKey: ['assets'] });
+      if (isNil(userId)) {
+        return;
+      }
+
+      void Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['assets', userId] }),
+        queryClient.invalidateQueries({ queryKey: ['allocations', userId] }),
+      ]);
     },
   });
 };
