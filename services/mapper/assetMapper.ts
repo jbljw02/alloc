@@ -19,9 +19,6 @@ export const toAssetRow = (dto: Partial<Asset>): Partial<AssetRow> => {
   if (isNotNil(dto.id)) {
     row.id = dto.id;
   }
-  if (isNotNil(dto.userId)) {
-    row.user_id = dto.userId;
-  }
   if (isNotNil(dto.name)) {
     row.name = dto.name;
   }
