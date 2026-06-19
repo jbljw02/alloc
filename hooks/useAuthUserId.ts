@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { isNil } from '@/utils/validators';
 
-const AUTH_USER_ID_QUERY_KEY = ['auth', 'userId'];
+export const AUTH_USER_ID_QUERY_KEY = ['auth', 'userId'];
 
 export const useAuthUserId = () => {
   return useQuery<string | null, Error>({
